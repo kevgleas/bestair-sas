@@ -1,37 +1,3 @@
-***************************************************************************************;
-* import and score calgary 2012-10-23.sas
-*
-* Created:		7/8/09
-* Last updated:	10/30/09 * see notes
-* Author:		Michael Rueschman
-*
-***************************************************************************************;
-* Purpose:
-*	This program imports data from the Calgary SAQLI for the BestAIR study. It is
-*		adapted from a program written by Michael Rueschman for the HomePAP Study
-*		[Import HomePAP Calgary (Parts 1 and 2).sas].
-*
-***************************************************************************************;
-***************************************************************************************;
-* NOTES:
-*	07/08/09 mnr
-*		Sought to merge both parts of the Calgary.  Add calculations for Total (SAQLI),
-*		which is dependent on timepoint (pre2, post5, post6).  Post-intervention
-*		calculations include additional factor in Total (SAQLI) based on QOL improvement and
-*		treatment-related symptoms.
-*	07/09/09 mnr
-*		Simple update to remove additional variables from final merge dataset.
-*	07/24/09 mnr
-*		Added timepoint listing to data checks.
-*	07/27/09 mnr
-*		Minor fixes to missingcheck.
-*	10/30/09 mnr
-*		Added proc compare to import.
-*	08/07/2013 kjg
-*		Commented code. Improved efficiency for when program runs as part of "update
-*		and check outcome variables.sas"
-***************************************************************************************;
-
 ****************************************************************************************;
 * ESTABLISH BESTAIR OPTIONS AND LIBRARIES
 ****************************************************************************************;

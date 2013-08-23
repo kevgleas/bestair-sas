@@ -1,4 +1,4 @@
-checks
+echo
 ======
 A collection of SAS programs used to import and manipulate the Echo data for the BestAIR study.
 

@@ -1,3 +1,10 @@
+## August 28, 2013
+
+### Changes
+  - entry error check.sas
+    - Add exception to check on extreme values for weight.
+
+
 ## August 23, 2013
 
 ### Changes

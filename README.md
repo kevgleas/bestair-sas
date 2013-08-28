@@ -62,7 +62,7 @@ Sleep Apnea Risk Perception (SARP) questionnaire data.
 
 <b>[semsa](https://github.com/sleepepi/bestair-sas/tree/master/semsa)  </b>  
 Perceived Self-Efficacy Measure for Sleep Apnea (SEMSA) questionnaire data.  
-  - mport semsa data.sas
+  - import semsa data.sas
 
 <b>[sf36](https://github.com/sleepepi/bestair-sas/tree/master/sf36)  </b>  
 Medical Outcomes Survey (SF-36) questionnaire data.  

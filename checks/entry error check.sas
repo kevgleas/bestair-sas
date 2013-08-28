@@ -458,8 +458,9 @@
 
     title 'Instances Where Reported Anthro. Weight is Less than 45 kg or Greater than 130 kg';
     select elig_studyid, timepoint from visits_only where ((0 < anth_weightkg < 45) or anth_weightkg > 130) and (
-                  elig_studyid ne 70179 and   /*confirmed 6/19/2013 JL*/
-                  elig_studyid ne 80024 and   /*confirmed 6/19/2013 JL*/
+                  elig_studyid ne 70179 and /*confirmed 6/19/2013 JL*/
+                  elig_studyid ne 74404 and /*confirmed 8/28/2013 KG*/
+                  elig_studyid ne 80024 and /*confirmed 6/19/2013 JL*/
                   elig_studyid ne 82545     /*confirmed 6/19/2013 JL*/
                   );
     title;

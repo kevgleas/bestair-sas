@@ -1,9 +1,3 @@
-## April 1, 2013
-
-### Changes
-  - Import BestAIR 24hr BP and compare to REDCap.sas
-    - Add comments.
-
 ## August 22, 2013
 
 ### Changes
@@ -13,3 +7,9 @@
     - Move header to README.md.
   - longitudinal bp.sas
     - Move header to README.md.
+
+## April 1, 2013
+
+### Changes
+  - Import BestAIR 24hr BP and compare to REDCap.sas
+    - Add comments.

@@ -1,3 +1,9 @@
+## September 3, 2013
+
+### Changes
+  - README.md
+    - Reformat to boldface categories.
+
 ## August 23, 2013
 
 ### Changes

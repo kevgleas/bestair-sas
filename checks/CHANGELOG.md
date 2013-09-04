@@ -1,3 +1,10 @@
+## September 4, 2013
+
+### Changes
+  - bestair endpoint completion flag.sas
+    - Refactor datasteps "codes2" and "codes3" using "endpointcheck_macro".
+
+
 ## September 3, 2013
 
 ### Changes

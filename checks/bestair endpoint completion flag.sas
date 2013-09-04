@@ -70,17 +70,21 @@
 
   run;
 
-  *create 6-month follow-up visit dataset;
-  data m6;
-    set baredcap(where=(redcap_event_name = "06_fu_arm_1"));
+  *create 6-month and 12-month follow-up visit dataset;
+  data m6or12;
+    set baredcap(where=(redcap_event_name = "06_fu_arm_1" or redcap_event_name = "12_fu_arm_1"));
 
     keep elig_studyid redcap_event_name bloods_studyid--blood_results_labcor_v_1 cal_studyid--cal_e26 cal_f01 cal_f02 phq8_studyid--phq8_complete sf36_studyid--sf36_bdfa_complete
       shq_sitread6--shq_driving6;
   run;
 
   *code variables for missing and not applicable data;
-  data codes2;
-    set m6;
+  *rename variables at output for 6- and 12-month visits to differentiate between visits at later merge step;
+  data  codes2 (rename=(visit_bloods=m6_bloods visit_bloods_nmiss=m6_bloods_nmiss visit_saqli=m6_saqli visit_saqli_nmiss=m6_saqli_nmiss
+                visit_phq8=m6_phq8 visit_phq8_nmiss=m6_phq8_nmiss visit_sf36=m6_sf36 visit_sf36_nmiss=m6_sf36_nmiss visit_ess=m6_ess visit_ess_nmiss=m6_ess_nmiss ))
+        codes3 (rename=(visit_bloods=m12_bloods visit_bloods_nmiss=m12_bloods_nmiss visit_saqli=m12_saqli visit_saqli_nmiss=m12_saqli_nmiss
+                visit_phq8=m12_phq8 visit_phq8_nmiss=m12_phq8_nmiss visit_sf36=m12_sf36 visit_sf36_nmiss=m12_sf36_nmiss visit_ess=m12_ess visit_ess_nmiss=m12_ess_nmiss ));
+    set m6or12;
 
     array relabeler2[*] bloods_totalchol--bloods_urinecreatin cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02 phq8_interest--phq8_total sf36_gh01--sf36_gh05
                         shq_sitread6--shq_stoppedcar6;
@@ -93,98 +97,43 @@
 
     *blood data;
     array bloods_checker2[*] bloods_totalchol--bloods_urinecreatin;
-    format m6_bloods 8.;
-    %endpointcheck_macro(endpoint_array=bloods_checker2, result_var=m6_bloods);
-    if m6_bloods = 0 then m6_bloods_nmiss = nmiss(of bloods_totalchol--bloods_urinecreatin); else m6_bloods_nmiss = 0;
+    format visit_bloods 8.;
+    %endpointcheck_macro(endpoint_array=bloods_checker2, result_var=visit_bloods);
+    if visit_bloods = 0 then visit_bloods_nmiss = nmiss(of bloods_totalchol--bloods_urinecreatin); else visit_bloods_nmiss = 0;
 
     *calgary (saqli) data;
     array saqli_checker2[*] cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02;
-    format m6_saqli 8.;
-    %endpointcheck_macro(endpoint_array=saqli_checker2, result_var=m6_saqli);
-    if m6_saqli = 0 then m6_saqli_nmiss = nmiss(of cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02);
-    else m6_saqli_nmiss = 0;
+    format visit_saqli 8.;
+    %endpointcheck_macro(endpoint_array=saqli_checker2, result_var=visit_saqli);
+    if visit_saqli = 0 then visit_saqli_nmiss = nmiss(of cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02);
+    else visit_saqli_nmiss = 0;
 
     *phq8 data;
     array phq8_checker2[*] phq8_interest--phq8_total;
-    format m6_phq8 8.;
-    %endpointcheck_macro(endpoint_array=phq8_checker2, result_var=m6_phq8);
-    if m6_phq8 = 0 then m6_phq8_nmiss = nmiss(of phq8_interest--phq8_total);
-    else m6_phq8_nmiss = 0;
+    format visit_phq8 8.;
+    %endpointcheck_macro(endpoint_array=phq8_checker2, result_var=visit_phq8);
+    if visit_phq8 = 0 then visit_phq8_nmiss = nmiss(of phq8_interest--phq8_total);
+    else visit_phq8_nmiss = 0;
 
     *sf36 data;
     array sf36_checker2[*] sf36_gh01--sf36_gh05;
-    format m6_sf36 8.;
-    %endpointcheck_macro(endpoint_array=sf36_checker2, result_var=m6_sf36);
-    if m6_sf36 = 0 then m6_sf36_nmiss = nmiss(of sf36_gh01--sf36_gh05);
-    else m6_sf36_nmiss = 0;
+    format visit_sf36 8.;
+    %endpointcheck_macro(endpoint_array=sf36_checker2, result_var=visit_sf36);
+    if visit_sf36 = 0 then visit_sf36_nmiss = nmiss(of sf36_gh01--sf36_gh05);
+    else visit_sf36_nmiss = 0;
 
     *ess data (from shq) - excludes "shq_driving" because variable is not scored as part of ess;
     array ess_checker2[*] shq_sitread6--shq_stoppedcar6;
-    format m6_ess 8.;
-    %endpointcheck_macro(endpoint_array=ess_checker2, result_var=m6_ess);
-    if m6_ess = 0 then m6_ess_nmiss = nmiss(of shq_sitread6--shq_stoppedcar6);
-    else m6_ess_nmiss = 0;
+    format visit_ess 8.;
+    %endpointcheck_macro(endpoint_array=ess_checker2, result_var=visit_ess);
+    if visit_ess = 0 then visit_ess_nmiss = nmiss(of shq_sitread6--shq_stoppedcar6);
+    else visit_ess_nmiss = 0;
 
     drop i;
 
-  run;
-
-  *create 12-month follow-up visit dataset;
-  data m12;
-    set baredcap(where=(redcap_event_name = "12_fu_arm_1"));
-
-    keep elig_studyid redcap_event_name bloods_studyid--blood_results_labcor_v_1 cal_studyid--cal_e26 cal_f01 cal_f02 phq8_studyid--phq8_complete sf36_studyid--sf36_bdfa_complete
-      shq_sitread6--shq_driving6;
-  run;
-
-  *code variables for missing and not applicable data;
-  data codes3;
-    set m12;
-
-    array relabeler3[*] bloods_totalchol--bloods_urinecreatin cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02 phq8_interest--phq8_total sf36_gh01--sf36_gh05
-                        shq_sitread6--shq_stoppedcar6;
-
-    do i = 1 to dim(relabeler3);
-      if relabeler3[i] = -8 then relabeler3[i] = .n;
-      else if relabeler3[i] = -9 then relabeler3[i] = .m;
-      else if relabeler3[i] = -10 then relabeler3[i] = .c;
-    end;
-
-    *blood data;
-    array bloods_checker3[*] bloods_totalchol--bloods_urinecreatin;
-    format m12_bloods 8.;
-    %endpointcheck_macro(endpoint_array=bloods_checker3, result_var=m12_bloods);
-    if m12_bloods = 0 then m12_bloods_nmiss = nmiss(of bloods_totalchol--bloods_urinecreatin); else m12_bloods_nmiss = 0;
-
-    *calgary (saqli) data;
-    array saqli_checker3[*] cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02;
-    format m12_saqli 8.;
-    %endpointcheck_macro(endpoint_array=saqli_checker3, result_var=m12_saqli);
-    if m12_saqli = 0 then m12_saqli_nmiss = nmiss(of cal_a01--cal_d21 cal_e01--cal_e26 cal_f01 cal_f02);
-    else m12_saqli_nmiss = 0;
-
-    *phq8 data;
-    array phq8_checker3[*] phq8_interest--phq8_total;
-    format m12_phq8 8.;
-    %endpointcheck_macro(endpoint_array=phq8_checker3, result_var=m12_phq8);
-    if m12_phq8 = 0 then m12_phq8_nmiss = nmiss(of phq8_interest--phq8_total);
-    else m12_phq8_nmiss = 0;
-
-    *sf36 data;
-    array sf36_checker3[*] sf36_gh01--sf36_gh05;
-    format m12_sf36 8.;
-    %endpointcheck_macro(endpoint_array=sf36_checker3, result_var=m12_sf36);
-    if m12_sf36 = 0 then m12_sf36_nmiss = nmiss(of sf36_gh01--sf36_gh05);
-    else m12_sf36_nmiss = 0;
-
-    *ess data (from shq) - excludes "shq_driving" because variable is not scored as part of ess;
-    array ess_checker3[*] shq_sitread6--shq_stoppedcar6;
-    format m12_ess 8.;
-    %endpointcheck_macro(endpoint_array=ess_checker3, result_var=m12_ess);
-    if m12_ess = 0 then m12_ess_nmiss = nmiss(of shq_sitread6--shq_stoppedcar6);
-    else m12_ess_nmiss = 0;
-
-    drop i;
+    if redcap_event_name = "06_fu_arm_1"
+      then output codes2;
+    else output codes3;
 
   run;
 

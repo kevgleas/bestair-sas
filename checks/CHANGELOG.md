@@ -3,6 +3,7 @@
 ### Changes
   - bestair endpoint completion flag.sas
     - Refactor datasteps "codes2" and "codes3" using "endpointcheck_macro".
+    - Combine datasteps "codes2" and "codes3" (6- and 12-month follow-up visit data) and differentiate visits at output.
 
 
 ## September 3, 2013

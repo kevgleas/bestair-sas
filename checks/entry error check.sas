@@ -47,105 +47,26 @@
 * check for misentered studyids;
 *********************************;
 
-  *transpose all studyids and merge into one dataset;
-
-  proc transpose data = visits_only out = anthstudyids (drop = _NAME_ _LABEL_) prefix = anth_studyid;
-    var anth_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bprpstudyids (drop = _NAME_ _LABEL_) prefix = bprp_studyid;
-    var bprp_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bloodsstudyids (drop = _NAME_ _LABEL_) prefix = bloods_studyid;
-    var bloods_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bpjstudyids (drop = _NAME_ _LABEL_) prefix = bpj_studyid;
-    var bpj_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bplogstudyids (drop = _NAME_ _LABEL_) prefix = bplog_studyid;
-    var bplog_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = calstudyids (drop = _NAME_ _LABEL_) prefix = cal_studyid;
-    var cal_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = phq8studyids (drop = _NAME_ _LABEL_) prefix = phq8_studyid;
-    var phq8_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = promstudyids (drop = _NAME_ _LABEL_) prefix = prom_studyid;
-    var prom_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = sarpstudyids (drop = _NAME_ _LABEL_) prefix = sarp_studyid;
-    var sarp_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = semsastudyids (drop = _NAME_ _LABEL_) prefix = semsa_studyid;
-    var semsa_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = sf36studyids (drop = _NAME_ _LABEL_) prefix = sf36_studyid;
-    var sf36_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = shqstudyids (drop = _NAME_ _LABEL_) prefix = shq_studyid;
-    var shq_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = qctonomstudyids (drop = _NAME_ _LABEL_)prefix = qctonom_studyid;
-    var qctonom_studyid;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = twpasstudyids (drop = _NAME_ _LABEL_) prefix = twpas_studyid;
-    var twpas_studyid;
-    by elig_studyid;
-  quit;
-
-  *merge studyid datasets and check for errors;
-  data allstudyids studyid_errors;
-    merge anthstudyids bprpstudyids bloodsstudyids bpjstudyids bplogstudyids calstudyids phq8studyids promstudyids sarpstudyids semsastudyids
-          sf36studyids shqstudyids qctonomstudyids twpasstudyids;
-    by elig_studyid;
-
-    array si_checker[*] elig_studyid--twpas_studyid3;
+  *create dataset of studyid variables where they differ from elig_studyid;
+  data studyid_errors (keep = elig_studyid timepoint var_error ent_error);
+    set visits_only;
+    array si_checker[*] _numeric_;
 
     format var_error $32.;
 
     do i = 1 to dim(si_checker);
-      if (si_checker[i] ne si_checker[1]) and si_checker[i] ne . and si_checker[i] ne -9
+      if scan(vname(si_checker[i]), -1, '_') = "studyid"
         then do;
-            var_error = vname(si_checker[i]);
-            output studyid_errors;
-          end;
-      else output allstudyids;
+          if (si_checker[i] ne si_checker[1]) and si_checker[i] ne . and si_checker[i] ne -9
+          then do;
+                var_error = vname(si_checker[i]);
+                ent_error = si_checker[i];
+                output studyid_errors;
+              end;
+        end;
+
     end;
 
-    drop i;
-
-  run;
-
-
-
-  proc sort data = allstudyids nodupkey;
-    by elig_studyid;
   run;
 
 
@@ -154,109 +75,46 @@
 * check for misentered namecodes;
 *********************************;
 
-  *transpose all namecodes and merge into one dataset;
-
-  proc transpose data = visits_only out = anthnamecodes (drop = _NAME_ _LABEL_) prefix = anth_namecode;
-    var anth_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bprpnamecodes (drop = _NAME_ _LABEL_) prefix = bprp_namecode;
-    var bprp_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bloodsnamecodes (drop = _NAME_ _LABEL_) prefix = bloods_namecode;
-    var bloods_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bpjnamecodes (drop = _NAME_ _LABEL_) prefix = bpj_namecode;
-    var bpj_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = bplognamecodes (drop = _NAME_ _LABEL_) prefix = bplog_namecode;
-    var bplog_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = calnamecodes (drop = _NAME_ _LABEL_) prefix = cal_namecode;
-    var cal_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = phq8namecodes (drop = _NAME_ _LABEL_) prefix = phq8_namecode;
-    var phq8_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = promnamecodes (drop = _NAME_ _LABEL_) prefix = prom_namecode;
-    var prom_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = sarpnamecodes (drop = _NAME_ _LABEL_) prefix = sarp_namecode;
-    var sarp_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = semsanamecodes (drop = _NAME_ _LABEL_) prefix = semsa_namecode;
-    var semsa_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = sf36namecodes (drop = _NAME_ _LABEL_) prefix = sf36_namecode;
-    var sf36_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = shqnamecodes (drop = _NAME_ _LABEL_) prefix = shq_namecode;
-    var shq_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = qctonomnamecodes (drop = _NAME_ _LABEL_)prefix = qctonom_namecode;
-    var qctonom_namecode;
-    by elig_studyid;
-  quit;
-
-  proc transpose data = visits_only out = twpasnamecodes (drop = _NAME_ _LABEL_) prefix = twpas_namecode;
-    var twpas_namecode;
-    by elig_studyid;
-  quit;
-
-  *merge namecode datasets and check for errors;
-  data allnamecodes namecode_errors;
-    merge anthnamecodes bprpnamecodes bloodsnamecodes bpjnamecodes bplognamecodes calnamecodes phq8namecodes promnamecodes sarpnamecodes semsanamecodes
-          sf36namecodes shqnamecodes qctonomnamecodes twpasnamecodes;
-    by elig_studyid;
-
-    array nc_checker[*] anth_namecode1--twpas_namecode3;
+  data namecode_errors (keep = elig_studyid anth_namecode timepoint var_error ent_error);
+    set visits_only;
+    array nc_checker[*] _character_;
 
     format var_error $32.;
 
-    if nc_checker[2] ne "" and ((nc_checker[2] = nc_checker[3]) or (nc_checker[2] = nc_checker[4])) and nc_checker[2] ne nc_checker[1]
-      then do;
-          var_error = vname(nc_checker[1]);
-          output namecode_errors;
-        end;
-    else do i = 1 to dim(nc_checker);
-      if upcase(nc_checker[i]) ne upcase(nc_checker[1]) and nc_checker[i] ne ""
-        then do;
-            var_error = vname(nc_checker[i]);
-            output namecode_errors;
+    *check namecodes for errors based on anthropometry namecode;
+    if nc_checker[1] ne "" then
+      do i = 1 to dim(nc_checker);
+        if scan(vname(nc_checker[i]), -1, '_') = "namecode"
+          then do;
+            if (nc_checker[i] ne nc_checker[1]) and nc_checker[i] ne ""
+            then do;
+                  var_error = vname(nc_checker[i]);
+                  ent_error = nc_checker[i];
+                  output namecode_errors;
+                end;
           end;
-      else output allnamecodes;
-    end;
 
-    drop i;
+      end;
 
-  run;
+    *run check for situation where person never had anthropometry data collected but did have other data such as questionnaires;
+    else
+      do;
+        nc_store = nc_checker[1];
+        do i= 1 to dim(nc_checker);
+        if (scan(vname(nc_checker[i]), -1, '_') = "namecode") and nc_checker[i] ne ""
+          then nc_store = nc_checker[i];
+        end;
+        if nc_store ne "" then
+          do i = 1 to dim(nc_checker);
+          if (scan(vname(nc_checker[i]), -1, '_') = "namecode") and (nc_checker[i] ne nc_store) and nc_checker[i] ne ""
+          then do;
+            var_error = vname(nc_checker[i]);
+            ent_error = nc_checker[i];
+            output namecode_errors;
+            end;
+          end;
+      end;
 
-
-  proc sort data = allnamecodes nodupkey;
-    by elig_studyid;
   run;
 
 
@@ -431,11 +289,11 @@
 
   *DATA ENTRY;
     title 'Instances Where Study ID was Entered Incorrectly';
-    select elig_studyid as StudyID, var_error as Mistake_Variable from studyid_errors;
+    select elig_studyid as StudyID, timepoint, var_error as Mistake_Variable, ent_error as Entered_As from studyid_errors;
     title;
 
     title 'Instances Where NameCode was Entered Incorrectly';
-    select elig_studyid as StudyID, anth_namecode1 as Namecode, var_error as Mistake_Variable from namecode_errors;
+    select elig_studyid as StudyID, timepoint, anth_namecode as Intended_Namecode, var_error as Mistake_Variable, ent_error as Entered_As from namecode_errors;
     title;
 
     title 'Instances Where Visit Date was Possibly Entered Incorrectly';

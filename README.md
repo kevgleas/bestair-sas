@@ -18,7 +18,7 @@ Laboratory (blood and urine) data.
 Calgary-Sleep Apnea Quality of Life Index (SAQLI) data.  
   - import and score calgary 2012-10-23.sas
 
-#### [checks]((https://github.com/sleepepi/bestair-sas/tree/master/checks)
+#### [checks](https://github.com/sleepepi/bestair-sas/tree/master/checks)
 Check data quality and completeness.  
   - bestair check for missing demographic info.sas
   - bestair endpoint completion flag.sas

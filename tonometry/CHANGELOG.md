@@ -4,6 +4,9 @@
 
   - bestair tonometry data checking and stats.sas
     - Refactor "pwv_check" and "pwa_check" datasteps using arrays.
+  - import bestair tonometry for update and check outcome variables.sas
+    - Refactor age category determination.
+    - Use do loop to check gender only once.
   -isolate pwv and augindex
     - Refactor "tonometry_scrub" step using array.
 

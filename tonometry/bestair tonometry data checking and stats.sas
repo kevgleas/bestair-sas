@@ -1,9 +1,11 @@
 ****************************************************************************************;
 * IMPORT BESTAIR OPTIONS AND LIBRARIES
-* IMPORT TONOMETRY DATA FROM SPHYGMACOR AND QC FORMS FROM REDCAP
 ****************************************************************************************;
 %include "\\rfa01\bwh-sleepepi-bestair\Data\SAS\bestair options and libnames.sas";
-%include "\\rfa01\bwh-sleepepi-bestair\data\sas\tonometry\import bestair tonometry.sas";
+
+****************************************************************************************;
+* FILE TO RUN AS PART OF "IMPORT BESTAIR TONOMETRY.SAS"
+****************************************************************************************;
 
 ***************************************************************************************;
 * DATA CHECKING - CHECK DATA IN SPHYGMACOR FILES ON RFA AGAINST QC FORMS IN REDCAP

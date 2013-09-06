@@ -1,3 +1,10 @@
+## September 6, 2013
+
+### Changes
+
+  - bestair tonometry data checking and stats.sas
+    - Refactor "pwv_check" and "pwa_check" datasteps using arrays.
+
 ## August 27, 2013
 
 ### Changes

@@ -8,7 +8,7 @@
     - Refactor age category determination.
     - Use do loop to check gender only once.
   - import bestair tonometry.sas
-    - Use %include statement to replace identical coding with "mport bestair tonometry for update and check outcome variables.sas"
+    - Use %include statement to replace identical coding with "import bestair tonometry for update and check outcome variables.sas"
   -isolate pwv and augindex
     - Refactor "tonometry_scrub" step using array.
 

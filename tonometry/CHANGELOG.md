@@ -4,6 +4,8 @@
 
   - bestair tonometry data checking and stats.sas
     - Refactor "pwv_check" and "pwa_check" datasteps using arrays.
+  -isolate pwv and augindex
+    - Refactor "tonometry_scrub" step using array.
 
 ## August 27, 2013
 

@@ -44,7 +44,6 @@
       shq_namecode = shq_namecode6;
     end;
     drop shq_trasleep6--shq_typnightsleep6 shq_namecode6 i;
-    retain elig_studyid shq_namecode shq_studyvisit shq_trasleep--shq_typnightsleep whiirs_total;
   run;
 
 
@@ -53,9 +52,9 @@
 ***************************************************************************************;
 
   data whiirs;
+    retain elig_studyid shq_namecode shq_studyvisit;
     merge redcapwhiirs_b(in=a) redcapwhiirs_6or12a(in=b);
     by elig_studyid shq_studyvisit;
-    keep elig_studyid shq_namecode shq_studyvisit shq_trasleep--shq_typnightsleep whiirs_total;
   run;
 
 

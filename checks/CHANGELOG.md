@@ -1,3 +1,10 @@
+## September 9, 2013
+
+### Changes
+  - complete check questionnaires.sas
+    - Eliminate unneccessary datasteps by utlizing drop= dataset option in earlier steps.
+
+
 ## September 4, 2013
 
 ### Changes

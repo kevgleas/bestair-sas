@@ -52,7 +52,7 @@
 
   run;
 
-  /*  
+  /*
   data twpas;
     retain elig_studyid timepoint;
     set questionnaires;
@@ -80,7 +80,7 @@
     drop cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid;
   run;
 
-  data questionnaires_basepending questionnaires_baseresolved;
+  data questionnaires_basepending questionnaires_baseresolved (drop = cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid cal_d22--cal_f02);
     set questionnaires1;
 
     if (cal_studyid = . or phq8_studyid = . or prom_studyid = . or sarp_studyid = . or semsa_studyid = . or sf36_studyid = . or twpas_studyid = .) and timepoint = 00
@@ -89,7 +89,8 @@
 
   run;
 
-  data questionnaires_6pending questionnaires_6resolved;
+  data questionnaires_6pending questionnaires_6resolved (drop = cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid
+                                                          cal_d22--cal_ds05p cal_e27--cal_es05p);
     set questionnaires1;
 
     if (cal_studyid = . or phq8_studyid = . or prom_studyid = . or sarp_studyid = . or semsa_studyid = . or sf36_studyid = . or twpas_studyid = .) and timepoint = 06
@@ -98,7 +99,8 @@
 
   run;
 
-  data questionnaires_12pending questionnaires_12resolved;
+  data questionnaires_12pending questionnaires_12resolved (drop = cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid
+                                                            cal_d22--cal_ds05p cal_e27--cal_es05p);
     set questionnaires1;
 
     if (cal_studyid = . or phq8_studyid = . or prom_studyid = . or sarp_studyid = . or semsa_studyid = . or sf36_studyid = . or twpas_studyid = .) and timepoint = 12
@@ -115,23 +117,6 @@
       select elig_studyid, timepoint from questionnaires_12pending;
     title;
   quit;
-
-  data questionnaires_baseresolved;
-    set questionnaires_baseresolved;
-    drop cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid cal_d22--cal_f02;
-  run;
-
-  data questionnaires_6resolved;
-    set questionnaires_6resolved;
-    drop cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid cal_d22--cal_ds05p cal_e27--cal_es05p;
-  run;
-
-  data questionnaires_12resolved;
-    set questionnaires_12resolved;
-    drop cal_studyid phq8_studyid prom_studyid sarp_studyid semsa_studyid sf36_studyid twpas_studyid cal_d22--cal_ds05p cal_e27--cal_es05p;
-  run;
-
-
 
 
 

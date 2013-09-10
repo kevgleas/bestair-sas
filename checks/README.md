@@ -9,7 +9,7 @@ This program imports eligibility data from REDCap for the BestAIR study and chec
 Contains macros used for repetitive code in `bestair endpoint completion flag.sas`.
 
 ##### [bestair endpoint completion flag.sas](https://github.com/sleepepi/bestair-sas/blob/master/checks/bestair%20endpoint%20completion%20flag.sas) <br />
-This program checks the completedness of endpoint measures for the BestAIR Trial.
+This program checks the completedness of endpoint measures for the BestAIR Trial. Utilizes macros contained in `bestair_checks_macros.sas`.
 
 ##### [complete check all.sas](https://github.com/sleepepi/bestair-sas/blob/master/checks/complete%20check%20all.sas) <br />
 Import relevant data from REDCap and the rfa server and run statistics regarding completeness percentages of various endpoints for the BestAIR study.

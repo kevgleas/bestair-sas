@@ -21,7 +21,7 @@
 ***************************************************************************************;
 
 
-  data bestairtwpas2;
+  data bestairtwpas;
     set batwpas_in;
     by elig_studyid;
 

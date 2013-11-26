@@ -297,7 +297,8 @@
     title;
 
     title 'Instances Where Visit Date was Possibly Entered Incorrectly';
-    select elig_studyid as StudyID, anth_namecode as Namecode, timepoint, var_error as Mistake_Variable from visitdate_errors;
+    select elig_studyid as StudyID, anth_namecode as Namecode, timepoint, var_error as Mistake_Variable from visitdate_errors
+    where elig_studyid ne 73088;  /*verified KG 11/04/13*/
     title;
 
     title 'Instances Where Study Visit (Timepoint) was Entered Incorrectly';

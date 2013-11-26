@@ -6,16 +6,55 @@
 
 
 *designed to run as part of "complete check all.sas";
-*if running independently, uncomment "IMPORT REDCAP DATA" step;
+*if running independently, uncomment "IMPORT REDCAP (and other) DATA" step;
 
 /*
 ****************************************************************************************;
 * IMPORT REDCAP DATA
 ****************************************************************************************;
 
+*limit dataset to randomized participants only;
+%include "\\rfa01\bwh-sleepepi-bestair\Data\SAS\redcap\_components\bestair create rand set.sas";
+
+  *rename dataset of randomized participants to match syntax in later include steps;
+
   data redcap;
-    set bestair.baredcap;
+    set redcap_rand;
   run;
+
+  data allpts_whichvisits_expected;
+    set randset;
+    if rand_date < 19359 then do;
+      expect_6mo_fu = 1;
+      expect_6mo_final = .;
+      expect_12mo_final = 1;
+    end;
+    else if rand_date ge 19359 then do;
+      expect_6mo_fu = .;
+      expect_6mo_final = 1;
+      expect_12mo_final = .;
+    end;
+  run;
+
+  *import list of all expected visits with final visits denoted;
+  proc import datafile = "&bestairpath\Kevin\List of All Expected Visits.csv"
+    out = all_expected_visits
+    dbms = csv
+    replace;
+    getnames = yes;
+  run;
+
+
+  *import pending visit list to exclude pending visits from expected data;
+  proc import datafile = "&bestairpath\Kevin\Pending Visits.csv"
+    out = pending_visits
+    dbms = csv
+    replace;
+    getnames = yes;
+    guessingrows = 50;
+  run;
+
+
 */
 
 
@@ -31,7 +70,7 @@
 
     keep elig_studyid redcap_event_name anth_studyid--bloods_urinecreatin qctonom_studyid--monitorqc_percentsuccess;
 
-    drop anth_namecode--anth_staffid anthropometry_complete bprp_namecode--bprp_staffid blood_pressure_and_r_v_0 bloods_namecode--bloods_studyvisit
+    drop anth_namecode anth_studyvisit--anth_staffid anthropometry_complete bprp_namecode--bprp_staffid blood_pressure_and_r_v_0 bloods_namecode--bloods_studyvisit
         qctonom_namecode--qctonom_staffid tonometry_qc_complete monitorqc_namecode--monitorqc_datauploadreas;
     run;
 
@@ -48,6 +87,22 @@
 
   run;
 
+  *exclude participants who have 12-month timepoint erroneously listed in REDCap and add visits for dropouts;
+  *(because study completion form was originalyy created to be completed after 12-month timepoint,
+  12-month timepoint is auto-created in REDCap when participant completes study, even if only intended to be enrolled for 6-months);
+
+  data crfs2;
+    merge all_expected_visits (in = a) crfs2 (in = b);
+    by elig_studyid timepoint;
+    if a;
+  run;
+
+  *exclude pending visits from calculation (6-month visit timepoint is created in REDCap at time of 6-month phone call);
+  data crfs2;
+    merge crfs2 (in = a) pending_visits (in = b keep = elig_studyid timepoint);
+    by elig_studyid timepoint;
+    if not b;
+  run;
 
 ****************************************************************************************;
 * IMPORT AND PROCESS RAW FILES FROM RFA SERVER
@@ -92,53 +147,65 @@
   data visit_counts;
     set crfs_withbptonom;
 
-    if (anth_studyid ne . or bprp_studyid ne . or bloods_studyid ne . or nreadings ne . or sphyg_pwv1 ne . or sphyg_augix1 ne .)
-      then do;
-        if timepoint = 00 then bl_allcount = 1;
-        if timepoint = 06 then mo6_allcount = 1;
-        if timepoint = 12 then mo12_allcount = 1;
-      end;
+    format  bl_allcount bl_crfcount bl_bloodcount bl_bpcount bl_tonomcount 
+            mo6_allcount mo6_crfcount mo6_bloodcount mo6_bpcount mo6_tonomcount 
+            mo12_allcount mo12_crfcount mo12_bloodcount mo12_bpcount mo12_tonomcount 
+            final_allcount final_crfcount final_bloodcount final_bpcount final_tonomcount 3.;
 
+    if timepoint = 00 then do;
+        bl_allcount = 1;
+        bl_crfcount = 1;
+        bl_bloodcount = 1;
+        bl_tonomcount = 1;
+    end;
 
-    if (anth_studyid ne . and bprp_studyid ne .)
-      then do;
-        if timepoint = 00 then bl_crfcount = 1;
-        if timepoint = 06 then mo6_crfcount = 1;
-        if timepoint = 12 then mo12_crfcount = 1;
-      end;
+    if timepoint = 06 then do;
+        mo6_allcount = 1;
+        mo6_crfcount = 1;
+        if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then mo6_bloodcount = 1;
+        mo6_tonomcount = 1;
+    end;
 
-    if (bloods_studyid ne .)
-      then do;
-        if timepoint = 00 then bl_bloodcount = 1;
-        if timepoint = 06 then mo6_bloodcount = 1;
-        if timepoint = 12 then mo12_bloodcount = 1;
-      end;
+    if timepoint = 12 then do;
+        mo12_allcount = 1;
+        mo12_crfcount = 1;
+        if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then mo12_bloodcount = 1;
+        mo12_tonomcount = 1;
+    end;
 
-    if (nreadings ne . or monitorqc_studyid = -9)
+    if is_final = 1 then do;
+        final_allcount = 1;
+        final_crfcount = 1;
+        if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then final_bloodcount = 1;
+        final_tonomcount = 1;
+    end;
+
+  
+*calculates bpcount based on non-pending data: hasbp + knownmissing + neverhadvisit + visitdate_earlier_than_oldestpending;
+* as of 11/21/13, oldest pending is 12-month data for 73250 whose visit date was 09/09/13 (SAS_DATE = 19610);
+
+    if nreadings ne . or monitorqc_studyid = -9 or
+        (anth_studyid in(.,-9) and bprp_studyid in(.,-9) and bloods_studyid in(.,-9) and sphyg_pwv1 in(.,-9) and sphyg_augix1 in(.,-9)) or
+        anth_date < 19610
       then do;
         if timepoint = 00 then bl_bpcount = 1;
         if timepoint = 06 then mo6_bpcount = 1;
         if timepoint = 12 then mo12_bpcount = 1;
+        if is_final = 1 then final_bpcount = 1;
       end;
 
-    if (sphyg_pwv1 ne . or sphyg_augix1 ne . or qctonom_studyid = -9)
-      then do;
-        if timepoint = 00 then bl_tonomcount = 1;
-        if timepoint = 06 then mo6_tonomcount = 1;
-        if timepoint = 12 then mo12_tonomcount = 1;
-      end;
 
-    keep elig_studyid timepoint bl_allcount--mo12_tonomcount;
+    keep elig_studyid timepoint bl_allcount--final_tonomcount;
 
   run;
 
 
   proc means noprint data = visit_counts;
-    output out = visit_countsums sum(bl_allcount) = bl_allcount sum(mo6_allcount) = mo6_allcount sum(mo12_allcount) = mo12_allcount
-                    sum(bl_crfcount) = bl_crfcount sum(mo6_crfcount) = mo6_crfcount sum(mo12_crfcount) = mo12_crfcount
-                    sum(bl_bloodcount) = bl_bloodcount sum(mo6_bloodcount) = mo6_bloodcount sum(mo12_bloodcount) = mo12_bloodcount
-                    sum(bl_bpcount) = bl_bpcount sum(mo6_bpcount) = mo6_bpcount sum(mo12_bpcount) = mo12_bpcount
-                    sum(bl_tonomcount) = bl_tonomcount sum(mo6_tonomcount) = mo6_tonomcount sum(mo12_tonomcount) = mo12_tonomcount;
+    output out = visit_countsums sum(bl_allcount) = bl_allcount sum(mo6_allcount) = mo6_allcount sum(mo12_allcount) = mo12_allcount sum(final_allcount) = final_allcount
+                    sum(bl_crfcount) = bl_crfcount sum(mo6_crfcount) = mo6_crfcount sum(mo12_crfcount) = mo12_crfcount sum(final_crfcount) = final_crfcount
+                    sum(bl_bloodcount) = bl_bloodcount sum(mo6_bloodcount) = mo6_bloodcount sum(mo12_bloodcount) = mo12_bloodcount sum(final_bloodcount) = final_bloodcount
+                    sum(bl_bpcount) = bl_bpcount sum(mo6_bpcount) = mo6_bpcount sum(mo12_bpcount) = mo12_bpcount sum(final_bpcount) = final_bpcount
+                    sum(bl_tonomcount) = bl_tonomcount sum(mo6_tonomcount) = mo6_tonomcount sum(mo12_tonomcount) = mo12_tonomcount sum(final_tonomcount) = final_tonomcount;
 
   run;
 
@@ -187,81 +254,31 @@
     visit_type = "12 Month";
 
   run;
+  
+  data final_countsums (keep = timepoint visit_type allcount crfcount bloodcount bpcount tonomcount);
+    retain visit_type timepoint;
+    set visit_countsums;
+
+    rename final_allcount = allcount;
+    rename final_crfcount = crfcount;
+    rename final_bloodcount = bloodcount;
+    rename final_bpcount = bpcount;
+    rename final_tonomcount = tonomcount;
+
+    timepoint = 99;
+    visit_type = "Combined Final";
+
+  run;
 
   data countsums_byvisit;
-    merge bl_countsums mo6_countsums mo12_countsums;
+    format visit_type $20.;
+    merge bl_countsums mo6_countsums mo12_countsums final_countsums;
     by timepoint;
   run;
 
-
-
-/*
-  data crfs_baseall crfs_6all crfs_12all;
-    set crfs2;
-
-    if timepoint = 00 then output crfs_baseall; else
-    if timepoint = 06 then output crfs_6all; else
-    if timepoint = 12 then output crfs_12all;
-
+  data crfs_resolved bp_resolved blood_resolved tonom_resolved;
+    set crfs_withbptonom (drop = anth_date);
   run;
-
-  data crfs_basepending crfs_baseresolved;
-    set crfs2;
-
-    if (anth_studyid = . and bprp_studyid= .) and timepoint = 00
-      then output crfs_basepending;
-    else if timepoint = 00 then output crfs_baseresolved;
-
-  run;
-
-  data crfs_6pending crfs_6resolved;
-    set crfs2;
-
-    if (anth_studyid = . and bprp_studyid= .) and timepoint = 06
-      then output crfs_6pending;
-    else if timepoint = 06 then output crfs_6resolved;
-
-  run;
-
-  data crfs_12pending crfs_12resolved;
-    set crfs2;
-
-    if (anth_studyid = . and bprp_studyid= .) and timepoint = 12
-      then output crfs_12pending;
-    else if timepoint = 12 then output crfs_12resolved;
-
-  run;
-  */
-
-  data crfs_pending crfs_resolved bp_pending bp_resolved blood_pending blood_resolved tonom_pending tonom_resolved;
-    set crfs_withbptonom;
-
-    if (anth_studyid = . and bprp_studyid = .)
-      then output crfs_pending;
-    else if timepoint ne . then output crfs_resolved;
-
-    if (bloods_studyid = .)
-      then output blood_pending;
-    else if timepoint ne . then output blood_resolved;
-
-    if (nreadings ne . or monitorqc_studyid = -9)
-      then output bp_resolved;
-    else if timepoint ne . then output bp_pending;
-
-    if (sphyg_pwv1 ne . or sphyg_augix1 ne . or qctonom_studyid = -9)
-      then output tonom_resolved;
-    else if timepoint ne . then output tonom_pending;
-
-  run;
-
-  *print study ids for participants REDCap denotes as pending;
-  proc sql;
-    title 'Visit Data Pending Entry';
-      select elig_studyid, timepoint from crfs_pending;
-    title;
-  quit;
-
-
 
 ****************************************************************************************;
 * CREATE DATASETS OF COMPLETENESS TABLES
@@ -318,11 +335,12 @@
   run;
 
 
-  data bp_comp00 bp_comp06 bp_comp12;
+  data bp_comp00 bp_comp06 bp_comp12 bp_compfinalv;
     set bp_completeness;
     if timepoint = 0 then output bp_comp00;
     if timepoint = 6 then output bp_comp06;
     if timepoint = 12 then output bp_comp12;
+    if is_final = 1 then output bp_compfinalv;
   run;
 
 
@@ -366,11 +384,26 @@
 
   run;
 
+  
+
+  proc means noprint data = bp_compfinalv;
+    output out = bp_compstatsfinalv sum(comp_bp) = comp_bp sum(part_bp) = part_bp sum(miss_bp) = miss_bp;
+  run;
+
+  data bp_compstatsfinalv (drop = _type_ _freq_);
+    retain visit_type timepoint;
+    set bp_compstatsfinalv;
+
+    timepoint = 99;
+    visit_type = "Combined Final";
+
+  run;
+
 
   data bp_compstats;
-    merge bp_compstats00 bp_compstats06 bp_compstats12;
+    format visit_type $20.;
+    merge bp_compstats00 bp_compstats06 bp_compstats12 bp_compstatsfinalv;
     by timepoint;
-
   run;
 
   data bp_compstatsall (drop = bloodcount crfcount tonomcount);
@@ -420,7 +453,7 @@
 
   run;
 
-  data blood_comp00 blood_comp06 blood_comp12;
+  data blood_comp00 blood_comp06 blood_comp12 blood_compfinalv;
     set bloodurine_allresolved;
     keep elig_studyid--bloods_urinecreatin nmiss_blood--pctmiss_urine;
 
@@ -438,6 +471,8 @@
     if timepoint = 00 then output blood_comp00;
     if timepoint = 06 then output blood_comp06;
     if timepoint = 12 then output blood_comp12;
+    if is_final = 1 then output blood_compfinalv;
+
 
   run;
 
@@ -481,10 +516,22 @@
 
   run;
 
+  proc means noprint data = blood_compfinalv;
+    output out = blood_compstatsfinalv sum(ncomp_blood) = ncomp_blood sum(ncomp_urine) = ncomp_urine sum(nmiss_blood) = nmiss_blood sum(nmiss_urine) = nmiss_urine;
+  run;
 
+  data blood_compstatsfinalv (drop = _type_ _freq_);
+    retain visit_type timepoint;
+    set blood_compstatsfinalv;
+
+    visit_type = "Combined Final";
+    timepoint= 99;
+
+  run;
 
   data blood_compstats;
-    merge blood_compstats00 blood_compstats06 blood_compstats12;
+    format visit_type $20.;
+    merge blood_compstats00 blood_compstats06 blood_compstats12 blood_compstatsfinalv;
     by timepoint;
 
   run;
@@ -513,7 +560,6 @@
     pctmiss_urineresolved = nmiss_urine/(2*bloodcount);
 
   run;
-
 
 
   proc sql;
@@ -561,11 +607,12 @@
 
   run;
 
-  data tonom_comp00 tonom_comp06 tonom_comp12;
+  data tonom_comp00 tonom_comp06 tonom_comp12 tonom_compfinalv;
     set tonom_completeness;
     if timepoint = 0 then output tonom_comp00;
     if timepoint = 6 then output tonom_comp06;
     if timepoint = 12 then output tonom_comp12;
+    if is_final = 1 then output tonom_compfinalv;
   run;
 
   proc means noprint data = tonom_comp00;
@@ -608,9 +655,23 @@
 
   run;
 
+    proc means noprint data = tonom_compfinalv;
+    output out = tonom_compstatsfinalv sum(pwa_comp) = pwa_comp sum(pwv_comp) = pwv_comp;
+  run;
+
+  data tonom_compfinalv (drop = _type_ _freq_);
+    retain visit_type timepoint;
+    set tonom_compstatsfinalv;
+
+    timepoint = 99;
+    visit_type = "Combined Final";
+
+  run;
+
 
   data tonom_compstats;
-    merge tonom_compstats00 tonom_compstats06 tonom_compstats12;
+    format visit_type $20.;
+    merge tonom_compstats00 tonom_compstats06 tonom_compstats12 tonom_compfinalv;
     by timepoint;
 
   run;
@@ -637,7 +698,7 @@
 
 
   *echo count manually calculated because of delay in processing;
-  *last counted 8/06/2013;
+  *last counted 11/19/2013;
 
   data ultrasound_compstatsfinal;
     set tonom_compstatsfinal;
@@ -645,14 +706,12 @@
     format pctcomp_echoresolved percent10.1;
 
     if timepoint = 0 then do;
-      echocount = 169;
       echo_comp = 155;  /*missing: 60678, 70245, 70335, 70337, 73088, 74068, 74404, 74567, 74721, 74756, 74772, 75063, 84319, 89191, 89565*/
-      pctcomp_echoresolved = echo_comp / echocount;
+      pctcomp_echoresolved = echo_comp / tonomcount;
       end;
     else if timepoint = 12 then do;
-      echocount = 63;
-      echo_comp = 58;   /*missing: 73068, 73119, 80024, 82444, 84175*/
-      pctcomp_echoresolved = echo_comp / echocount;
+      echo_comp = 72;   /*missing: 73068, 73093, 73119, 80024, 82444, 84175*/ /*check 91396 - currently marked missing because we need images still*/
+      pctcomp_echoresolved = echo_comp / tonomcount;
       end;
 
   run;

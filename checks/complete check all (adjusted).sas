@@ -25,7 +25,7 @@
 
 
   proc sql;
-  ods pdf file="\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\BestAIR Completeness &sasfiledate..PDF";
+  ods pdf file="\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\_adjusted\BestAIR Completeness (adjusted) &sasfiledate..PDF";
 
   title "BestAIR 24-Hour Ambulatory Blood Pressure Completeness Percentages";
   select visit_type as Visit, pctpart_bpresolved label = "Including Partial", pctcomp_bpresolved label = "Excluding Partial"

@@ -36,7 +36,7 @@
   run;
 
 
-  data tonometry2;
+  data tonometry;
     set tonometry_scrub;
 
     avgpwv = MEAN(of qctonom_pwv1-qctonom_pwv4);

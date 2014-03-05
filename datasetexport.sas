@@ -1244,7 +1244,6 @@ data bamaster2;
   monitorqc_10readingsday
   monitorqc_4readingsnight
   monitorqc_percentsuccess
-  monitorqc_comments
   LVEDD
   LVESD
   IVS
@@ -1393,9 +1392,7 @@ data bamaster2;
   ess_bmi
   ess_redcap_calc_berscore
   ess_eligibility
-  embqs_unit_id
   embqs_study_passed
-  embqs_comments
   embqs_first_pass_ahi
   embqs_ekg_signal
   embqs_cannula_flow_signal
@@ -1410,7 +1407,6 @@ data bamaster2;
   embqs_oximetry_qcode
   embqs_flow_qcode
   embqs_overall_quality
-  embqs_scoringcomments
   embqs_alert
   embqs_reason___1
   embqs_heart_ecg___1
@@ -1663,46 +1659,12 @@ data bamaster2;
   cpappres_randtx
   cpappres_titration
   cpappres_studytype
-  cpappres_cpapserial
-  cpappres_humidserial
-  cpappres_wifi_modem
   cpappres_masktype
   cpappres_maskbrand
   cpappres_masksize
   cpappres_chinstrap
   cpappres_ramp
   cpappres_c_flex
-  medalert_bp
-  medalert_bpimmsys
-  medalert_bpimmdia
-  medalert_bpurgsys
-  medalert_bpurgdia
-  medalert_ecg
-  medalert_ecgimmfibduration
-  medalert_ecgimmfib
-  medalert_ecgimmnofib
-  medalert_ecgimmvenfib
-  medalert_ecgimmsymparr
-  medalert_ecgurgafib
-  medalert_ecgurgmobitz
-  medalert_ecgurgventach
-  medalert_hr
-  medalert_hrimm140
-  medalert_hrimm40
-  medalert_phq
-  medalert_phqimm15
-  medalert_phqurg15
-  medalert_24hrbp
-  medalert_24hrbpimmsys
-  medalert_24hrimmdia
-  medalert_24hrbpurgsys
-  medalert_24hrurgdia
-  medalert_glu
-  medalert_gluimm
-  medalert_gluurg
-  medalert_tri
-  medalert_triimm
-  medalert_triurg
   phq8_difficulty
   shq_hrspnightweek
   shq_hrspnightweekends
@@ -1942,26 +1904,22 @@ data bamaster2;
   qctonom_qcnumbersred1
   qctonom_standdev1
   qctonom_standarddeviation1
-  qctonom_comments1
   qctonom_proximaldistance2
   qctonom_distaldistance2
   qctonom_qcnumbersred2
   qctonom_standdev2
   qctonom_standarddeviation2
-  qctonom_comments2
   qctonom_pwv1pwv2
   qctonom_proximaldistance3
   qctonom_distaldistance3
   qctonom_qcnumbersred3
   qctonom_standdev3
   qctonom_standarddeviation3
-  qctonom_comments3
   qctonom_proximaldista2_50e
   qctonom_distaldistanc2_f1a
   qctonom_qcnumbersred32_d69
   qctonom_standdev4
   qctonom_standarddeviation4
-  qctonom_comments3a
   qctonom_bp
   qctonom_map1
   qctonom_operatorindex1
@@ -1970,14 +1928,12 @@ data bamaster2;
   qctonom_notes1
   qctonom_specifynotes1
   qctonom_augpress1
-  qctonom_comments4
   qctonom_operatorindex2
   qctonom_specifyoi2
   qctonom_qcnumbersredpwa2
   qctonom_notes2
   qctonom_specifynotes2
   qctonom_augpress2
-  qctonom_comments5
   qctonom_aorticaug
   qctonom_operatorindex3
   qctonom_specifyoi3
@@ -1985,14 +1941,12 @@ data bamaster2;
   qctonom_notes3
   qctonom_specifynotes3
   qctonom_augpress3
-  qctonom_comments6
   qctonom_operatorindex4
   qctonom_specifyoi4
   qctonom_qcnumbersredpwa4
   qctonom_notes4
   qctonom_specifynotes4
   qctonom_augpress4
-  qctonom_comments7
   twpas_light_yn
   twpas_light_days
   twpas_light_hrs
@@ -2067,51 +2021,29 @@ data bamaster2;
   twpas_workheavy_hrs
   twpas_usualpace
   twomonth_chestpain
-  twomonth_specify1a
   twomonth_shortnessofbreath
-  twomonth_specify1b
   twomonth_sleepiness
-  twomonth_specify1c
   twomonth_healthprofess
   twomonth_overnightstay
   twomonth_docrec
-  twomonth_specify3
   twomonth_conditions
-  twomonth_specify4
   twomonth_missednights
-  twomonth_specify5
   twomonth_maskfit
-  twomonth_specify6a
   twomonth_headgear
-  twomonth_specify6b
   twomonth_maskleaks
-  twomonth_specify6c
   twomonth_pressure
-  twomonth_specify6d
   twomonth_nasalcongestion
-  twomonth_specify6e
   twomonth_throatdryness
-  twomonth_specify6f
   twomonth_sinus
-  twomonth_specify6g
   twomonth_noise
-  twomonth_specify6h
   twomonth_eyeirrit
-  twomonth_specify6i
   twomonth_skinirrit
-  twomonth_specify6j
   twomonth_other
-  twomonth_specify6k
   twomonth_nasalstrips
-  twomonth_specify7
   twomonth_sleepreg
-  twomonth_specify8
   twomonth_positionchange
-  twomonth_specify9
   twomonth_changestime
-  twomonth_bedtimecomment
   twomonth_recipes
-  twomonth_specify11a
   twomonth_exercise
   phonechanges_initiated_by
   phonechanges_call_reason___1
@@ -2133,18 +2065,12 @@ data bamaster2;
   phonechanges_changed___4
   phonechanges_changesvp
   phonechanges_changesvc
-  phonechanges_notes
   phonechanges_amounttime
   treatdisc_reason
   treatdisc_crossover
   treatdisc_crossreason
-  treatdisc_comments
   sc_primaryreason
   sc_primaryreason_other
-  sc_guesstreat
-  sc_guesstreatarm
-  sc_initiatepap
-  sc_comments
   cbt1_rate1
   cbt1_video1
   cbt1_video2
@@ -2479,7 +2405,6 @@ data bamaster2;
   rename=(monitorqc_10readingsday=tenreadingsday)
   rename=(monitorqc_4readingsnight=fourreadingsnight)
   rename=(monitorqc_percentsuccess=percentsuccess)
-  rename=(monitorqc_comments=monitorcomments)
   rename=(LVEDD=lvedd)
   rename=(LVESD=lvesd)
   rename=(IVS=ivs)
@@ -2628,9 +2553,7 @@ data bamaster2;
   rename=(ess_bmi=berbmi)
   rename=(ess_redcap_calc_berscore=rberscor)
   rename=(ess_eligibility=berelig)
-  rename=(embqs_unit_id=emblunitid)
   rename=(embqs_study_passed=emblpass)
-  rename=(embqs_comments=emblcomm)
   rename=(embqs_first_pass_ahi=emblahi)
   rename=(embqs_ekg_signal=ekgsignal)
   rename=(embqs_cannula_flow_signal=cannulasignal)
@@ -2645,7 +2568,6 @@ data bamaster2;
   rename=(embqs_oximetry_qcode=oximetryqual)
   rename=(embqs_flow_qcode=flowqual)
   rename=(embqs_overall_quality=emblqual)
-  rename=(embqs_scoringcomments=emblscorcomm)
   rename=(embqs_alert=emblalert)
   rename=(embqs_reason___1=emblreason)
   rename=(embqs_heart_ecg___1=heartecg1)
@@ -2898,46 +2820,12 @@ data bamaster2;
   rename=(cpappres_randtx=randtx)
   rename=(cpappres_titration=titration)
   rename=(cpappres_studytype=studytype)
-  rename=(cpappres_cpapserial=cpapserial)
-  rename=(cpappres_humidserial=humidserial)
-  rename=(cpappres_wifi_modem=wifimodem)
   rename=(cpappres_masktype=masktype)
   rename=(cpappres_maskbrand=maskbrand)
   rename=(cpappres_masksize=masksize)
   rename=(cpappres_chinstrap=chinstrap)
   rename=(cpappres_ramp=ramp)
   rename=(cpappres_c_flex=cflex)
-  rename=(medalert_bp=alertbp)
-  rename=(medalert_bpimmsys=bpimmsys)
-  rename=(medalert_bpimmdia=bpimmdia)
-  rename=(medalert_bpurgsys=bpurgsys)
-  rename=(medalert_bpurgdia=bpurgdia)
-  rename=(medalert_ecg=ecg)
-  rename=(medalert_ecgimmfibduration=ecgimmfibduration)
-  rename=(medalert_ecgimmfib=ecgimmfib)
-  rename=(medalert_ecgimmnofib=ecgimmnofib)
-  rename=(medalert_ecgimmvenfib=ecgimmvenfib)
-  rename=(medalert_ecgimmsymparr=ecgimmsymparr)
-  rename=(medalert_ecgurgafib=ecgurgafib)
-  rename=(medalert_ecgurgmobitz=ecgurgmobitz)
-  rename=(medalert_ecgurgventach=ecgurgventach)
-  rename=(medalert_hr=hr)
-  rename=(medalert_hrimm140=hrimm140)
-  rename=(medalert_hrimm40=hrimm40)
-  rename=(medalert_phq=phq)
-  rename=(medalert_phqimm15=phqimm15)
-  rename=(medalert_phqurg15=phqurg15)
-  rename=(medalert_24hrbp=alert24hrbp)
-  rename=(medalert_24hrbpimmsys=alert24hrbpimmsys)
-  rename=(medalert_24hrimmdia=alert24hrbpimmdia)
-  rename=(medalert_24hrbpurgsys=alert24hrbpurgsys)
-  rename=(medalert_24hrurgdia=alert24hrbpurgdia)
-  rename=(medalert_glu=glu)
-  rename=(medalert_gluimm=gluimm)
-  rename=(medalert_gluurg=gluurg)
-  rename=(medalert_tri=tri)
-  rename=(medalert_triimm=triimm)
-  rename=(medalert_triurg=triurg)
   rename=(phq8_difficulty=phqdiff)
   rename=(shq_hrspnightweek=hrspnightweek)
   rename=(shq_hrspnightweekends=hrspnightweekends)
@@ -3177,26 +3065,22 @@ data bamaster2;
   rename=(qctonom_qcnumbersred1=qcnumbersred1)
   rename=(qctonom_standdev1=standdev1)
   rename=(qctonom_standarddeviation1=standarddeviation1)
-  rename=(qctonom_comments1=tonomcomm1)
   rename=(qctonom_proximaldistance2=proximaldistance2)
   rename=(qctonom_distaldistance2=distaldistance2)
   rename=(qctonom_qcnumbersred2=qcnumbersred2)
   rename=(qctonom_standdev2=standdev2)
   rename=(qctonom_standarddeviation2=standarddeviation2)
-  rename=(qctonom_comments2=tonomcomm2)
   rename=(qctonom_pwv1pwv2=pwv1pwv2)
   rename=(qctonom_proximaldistance3=proximaldistance3)
   rename=(qctonom_distaldistance3=distaldistance3)
   rename=(qctonom_qcnumbersred3=qcnumbersred3)
   rename=(qctonom_standdev3=standdev3)
   rename=(qctonom_standarddeviation3=standarddeviation3)
-  rename=(qctonom_comments3=tonomcomm3)
   rename=(qctonom_proximaldista2_50e=proximaldistance4)
   rename=(qctonom_distaldistanc2_f1a=distaldistance4)
   rename=(qctonom_qcnumbersred32_d69=qcnumbersred4)
   rename=(qctonom_standdev4=standdev4)
   rename=(qctonom_standarddeviation4=standarddeviation4)
-  rename=(qctonom_comments3a=tonomcomm4)
   rename=(qctonom_bp=bp_pwa)
   rename=(qctonom_map1=map_pwa)
   rename=(qctonom_operatorindex1=operatorindex1)
@@ -3205,14 +3089,12 @@ data bamaster2;
   rename=(qctonom_notes1=tonomnotes1)
   rename=(qctonom_specifynotes1=specifynotes1)
   rename=(qctonom_augpress1=augpress1)
-  rename=(qctonom_comments4=tonomcomm5)
   rename=(qctonom_operatorindex2=operatorindex2)
   rename=(qctonom_specifyoi2=specifyoi2)
   rename=(qctonom_qcnumbersredpwa2=qcnumbersredpwa2)
   rename=(qctonom_notes2=tonomnotes2)
   rename=(qctonom_specifynotes2=specifynotes2)
   rename=(qctonom_augpress2=augpress2)
-  rename=(qctonom_comments5=tonomcomm6)
   rename=(qctonom_aorticaug=aorticaug)
   rename=(qctonom_operatorindex3=operatorindex3)
   rename=(qctonom_specifyoi3=specifyoi3)
@@ -3220,14 +3102,12 @@ data bamaster2;
   rename=(qctonom_notes3=tonomnotes3)
   rename=(qctonom_specifynotes3=specifynotes3)
   rename=(qctonom_augpress3=augpress3)
-  rename=(qctonom_comments6=tonomcomm7)
   rename=(qctonom_operatorindex4=operatorindex4)
   rename=(qctonom_specifyoi4=specifyoi4)
   rename=(qctonom_qcnumbersredpwa4=qcnumbersredpwa4)
   rename=(qctonom_notes4=tonomnotes4)
   rename=(qctonom_specifynotes4=specifynotes4)
   rename=(qctonom_augpress4=augpress4)
-  rename=(qctonom_comments7=tonomcomm8)
   rename=(twpas_light_yn=houselightyn)
   rename=(twpas_light_days=houselightdays)
   rename=(twpas_light_hrs=houselighthrs)
@@ -3302,51 +3182,29 @@ data bamaster2;
   rename=(twpas_workheavy_hrs=workheavydays)
   rename=(twpas_usualpace=usualpace)
   rename=(twomonth_chestpain=twochestpain)
-  rename=(twomonth_specify1a=twospecify1a)
   rename=(twomonth_shortnessofbreath=twoshortnessofbreath)
-  rename=(twomonth_specify1b=twospecify1b)
   rename=(twomonth_sleepiness=twosleepiness)
-  rename=(twomonth_specify1c=twospecify1c)
   rename=(twomonth_healthprofess=twohealthprofess)
   rename=(twomonth_overnightstay=twoovernightstay)
   rename=(twomonth_docrec=twodocrec)
-  rename=(twomonth_specify3=twospecify3)
   rename=(twomonth_conditions=twoconditions)
-  rename=(twomonth_specify4=twospecify4)
   rename=(twomonth_missednights=twomissednights)
-  rename=(twomonth_specify5=twospecify5)
   rename=(twomonth_maskfit=twomaskfit)
-  rename=(twomonth_specify6a=twospecify6a)
   rename=(twomonth_headgear=twoheadgear)
-  rename=(twomonth_specify6b=twospecify6b)
   rename=(twomonth_maskleaks=twomaskleaks)
-  rename=(twomonth_specify6c=twospecify6c)
   rename=(twomonth_pressure=twopressure)
-  rename=(twomonth_specify6d=twospecify6d)
   rename=(twomonth_nasalcongestion=twonasal)
-  rename=(twomonth_specify6e=twospecify6e)
   rename=(twomonth_throatdryness=twothroatdryness)
-  rename=(twomonth_specify6f=twospecify6f)
   rename=(twomonth_sinus=twosinus)
-  rename=(twomonth_specify6g=twospecify6g)
   rename=(twomonth_noise=twonoise)
-  rename=(twomonth_specify6h=twospecify6h)
   rename=(twomonth_eyeirrit=twoeyeirrit)
-  rename=(twomonth_specify6i=twospecify6i)
   rename=(twomonth_skinirrit=twoskinirritation)
-  rename=(twomonth_specify6j=twospecify6j)
   rename=(twomonth_other=twoother)
-  rename=(twomonth_specify6k=twospecify6k)
   rename=(twomonth_nasalstrips=twonasalstrips)
-  rename=(twomonth_specify7=twospecify7)
   rename=(twomonth_sleepreg=twosleepreg)
-  rename=(twomonth_specify8=twospecify8)
   rename=(twomonth_positionchange=twopositionchange)
-  rename=(twomonth_specify9=twospecify9)
   rename=(twomonth_changestime=twochangestime)
-  rename=(twomonth_bedtimecomment=twospecify10)
   rename=(twomonth_recipes=tworecipes)
-  rename=(twomonth_specify11a=twospecify11a)
   rename=(twomonth_exercise=twoexercise)
   rename=(phonechanges_initiated_by=phoneinitby)
   rename=(phonechanges_call_reason___1=phonereason1)
@@ -3368,18 +3226,12 @@ data bamaster2;
   rename=(phonechanges_changed___4=phonechange4)
   rename=(phonechanges_changesvp=phonechangevp)
   rename=(phonechanges_changesvc=phonechangevc)
-  rename=(phonechanges_notes=phonenotes)
   rename=(phonechanges_amounttime=phoneamounttime)
   rename=(treatdisc_reason=discreason)
   rename=(treatdisc_crossover=disccrossover)
   rename=(treatdisc_crossreason=disccrossreason)
-  rename=(treatdisc_comments=disccomments)
   rename=(sc_primaryreason=scprimaryreason)
   rename=(sc_primaryreason_other=scprimaryreasonother)
-  rename=(sc_guesstreat=scguesstreat)
-  rename=(sc_guesstreatarm=scguesstreatarm)
-  rename=(sc_initiatepap=scinitiatepap)
-  rename=(sc_comments=sccomments)
   rename=(cbt1_rate1=cbt1motivation1)
   rename=(cbt1_video1=cbt1video1)
   rename=(cbt1_video2=cbt1video2)

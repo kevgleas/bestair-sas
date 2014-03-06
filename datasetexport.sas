@@ -1012,6 +1012,7 @@ data bestair_master;
   if bloods_triglyc < 0 then bloods_triglyc = .;
   if bloods_serumgluc < 0 then bloods_serumgluc = .;
   if bloods_fibrinactivity < 0 then bloods_fibrinactivity = .;
+  if bloods_urinemicro < 0 then bloods_urinemicro = .;
 
 run;
 

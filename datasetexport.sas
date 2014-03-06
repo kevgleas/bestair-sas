@@ -1010,6 +1010,7 @@ data bestair_master;
   if qctonom_pwv3 < 0 then qctonom_pwv3 = .;
   if qctonom_pwv4 < 0 then qctonom_pwv4 = .;
   if bloods_triglyc < 0 then bloods_triglyc = .;
+  if bloods_serumgluc < 0 then bloods_serumgluc = .;
 
 run;
 

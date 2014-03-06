@@ -1014,6 +1014,7 @@ data bestair_master;
   if bloods_fibrinactivity < 0 then bloods_fibrinactivity = .;
   if bloods_urinemicro < 0 then bloods_urinemicro = .;
   if shq_waketimenightsleep < 0 then shq_waketimenightsleep = .;
+  if elig_incl03osaahi < 0 then elig_incl03osaahi = .;
 
 run;
 

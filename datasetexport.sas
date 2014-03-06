@@ -1013,6 +1013,7 @@ data bestair_master;
   if bloods_serumgluc < 0 then bloods_serumgluc = .;
   if bloods_fibrinactivity < 0 then bloods_fibrinactivity = .;
   if bloods_urinemicro < 0 then bloods_urinemicro = .;
+  if shq_waketimenightsleep < 0 then shq_waketimenightsleep = .;
 
 run;
 

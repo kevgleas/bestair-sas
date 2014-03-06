@@ -158,8 +158,6 @@ data ba_master;
 
   attrib _all_ label = "";
   format _all_;
-  *format medalert_pptphysnotdate8 medalert_pptphysnotdate7 medalert_pptphysnotdate6 medalert_pptphysnotdate5 medalert_pptphysnotdate4 medalert_pptphysnotdate2 medalert_pptphysnotdate medalert_pptnotdate2 medalert_physnotdate8 medalert_physnotdate7 cal_datecal phonechangedate datephone datedisc datecomp compdob datetwpas twpasdate datesf36 datesemsa datesarp dateprom datephq8 essdate twodate datescored datereviewed daterecorded datereceived datenotified datetonom removaldate datebplog attachdate datebpj monitorstartdate monitorenddate dateupload datemonitor daterand datejournal dateshq6 dateshq eligdob eligdate dateenroll datetitration datedelivered datecpap datesc datelastinterv datefinal saestopdate saeonsetdate datesae pptnotdate8 pptnotdate7 pptnotdate6 pptnotdate5 pptnotdate4 pptnotdate physnotdate6 physnotdate5 physnotdate4 physnotdate2 physnotdate datemedalert echodate datebprp datebloods dateanth datedevoccured datedevdiscovered datesaecat dateae aestopdate aestartdate mmddyy10.;
-  *format phonetime wakeweekends wakeweekdays embltime emblstop emblstart sleeptotal removaltime attachtime timewake timebed monitorstarttime monitorendtime avgwaketime avgbedtime gotobedweekends gotobedweek timetotal time8.;
 run;
 
 data bestair_master;
@@ -187,6 +185,7 @@ data bestair_master;
   if ess_eligibility < -3 then ess_eligibility = .;
   if cardiology_berlin_ess_complete < -3 then cardiology_berlin_ess_complete = .;
   if embqs_study_passed < -3 then embqs_study_passed = .;
+  if embqs_first_pass_ahi < 0 then embqs_first_pass_ahi = .;
   if embqs_ekg_qcode < -3 then embqs_ekg_qcode = .;
   if embqs_cannula_flow_qcode < -3 then embqs_cannula_flow_qcode = .;
   if embqs_thoracic_qcode < -3 then embqs_thoracic_qcode = .;
@@ -983,8 +982,8 @@ data bestair_master;
   if anth_hipcm2 < 0 then anth_hipcm2 = .;
   if anth_hipcm3 < 0 then anth_hipcm3 = .;
   if anth_heightcm1 < 0 then anth_heightcm1 = .;
-  if anth_heightcm1 < 0 then anth_heightcm1 = .;
-  if anth_heightcm1 < 0 then anth_heightcm1 = .;
+  if anth_heightcm2 < 0 then anth_heightcm2 = .;
+  if anth_heightcm3 < 0 then anth_heightcm3 = .;
   if anth_neckcm1 < 0 then anth_neckcm1 = .;
   if anth_neckcm2 < 0 then anth_neckcm2 = .;
   if anth_neckcm3 < 0 then anth_neckcm3 = .;

@@ -1015,6 +1015,7 @@ data bestair_master;
   if bloods_urinemicro < 0 then bloods_urinemicro = .;
   if shq_waketimenightsleep < 0 then shq_waketimenightsleep = .;
   if elig_incl03osaahi < 0 then elig_incl03osaahi = .;
+  if shq_minbedtime < 0 then shq_minbedtime = .;
 
 run;
 

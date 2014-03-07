@@ -1017,6 +1017,7 @@ data bestair_master;
   if elig_incl03osaahi < 0 then elig_incl03osaahi = .;
   if shq_minbedtime < 0 then shq_minbedtime = .;
   if shq_minbedtime6 < 0 then shq_minbedtime6 = .;
+  if bloods_creactivepro < 0 then bloods_creactivepro = .;
 
 run;
 

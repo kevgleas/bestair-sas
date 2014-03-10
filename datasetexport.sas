@@ -1045,6 +1045,7 @@ data bestair_master;
   if shq_cigperday6 < 0 then shq_cigperday6 = .;
   if qctonom_map_pwv < 0 then qctonom_map_pwv = '';
   if qctonom_proximaldistance1 < 0 then qctonom_proximaldistance1 = .;
+  if qctonom_proximaldistance2 < 0 then qctonom_proximaldistance2 = .;
 
 run;
 

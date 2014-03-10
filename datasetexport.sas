@@ -1027,6 +1027,7 @@ data bestair_master;
   if anth_waistcm1 < 0 then anth_waistcm1 = .;
   if anth_waistcm2 < 0 then anth_waistcm2 = .;
   if anth_waistcm3 < 0 then anth_waistcm3 = .;
+  if bplog_pulse< 0 then bplog_pulse = .;
 
 run;
 

@@ -1020,6 +1020,7 @@ data bestair_master;
   if bloods_creactivepro < 0 then bloods_creactivepro = .;
   if qctonom_augix1 < 0 then qctonom_augix1 = .;
   if qctonom_augix2 < 0 then qctonom_augix2 = .;
+  if qctonom_aix3 < 0 then qctonom_aix3 = .;
 
 run;
 

@@ -1018,6 +1018,7 @@ data bestair_master;
   if shq_minbedtime < 0 then shq_minbedtime = .;
   if shq_minbedtime6 < 0 then shq_minbedtime6 = .;
   if bloods_creactivepro < 0 then bloods_creactivepro = .;
+  if qctonom_augix1 < 0 then qctonom_augix1 = .;
 
 run;
 

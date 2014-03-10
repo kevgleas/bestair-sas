@@ -1030,6 +1030,7 @@ data bestair_master;
   if bplog_pulse< 0 then bplog_pulse = .;
   if shq_nap5min < 0 then shq_nap5min = .;
   if shq_diabetesage < 0 then shq_diabetesage = .;
+  if shq_highbpage < 0 then shq_highbpage = .;
 
 run;
 

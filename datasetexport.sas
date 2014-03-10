@@ -1037,6 +1037,7 @@ data bestair_master;
   if shq_eversmokeoldstop < 0 then shq_eversmokeoldstop = .;
   if shq_smokenow < 0 then then shq_smokenow = .;
   if shq_ovariesremov < 0 then shq_ovariesremov = .;
+  if shq_hysterectomyage < 0 then shq_hysterectomyage = .;
 
 run;
 

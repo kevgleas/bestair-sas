@@ -1047,6 +1047,7 @@ data bestair_master;
   if qctonom_proximaldistance1 < 0 then qctonom_proximaldistance1 = .;
   if qctonom_proximaldistance2 < 0 then qctonom_proximaldistance2 = .;
   if qctonom_proximaldistance3 < 0 then qctonom_proximaldistance3 = .;
+  if qctonom_proximaldista2_50e < 0 then qctonom_proximaldista2_50e = .;
 
 run;
 

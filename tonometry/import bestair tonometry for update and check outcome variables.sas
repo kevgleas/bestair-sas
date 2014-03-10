@@ -103,61 +103,61 @@ x net use y: "\\rfa01\BWH-SleepEpi-bestair\Data\Tonometry\Scored" /P:No;
   run;
 
   *check for extreme values of ap or aix within pwa files;
-	data batonometry_checkpwa batonometry_pwa_ap_err batonometry_pwa_aix_err;
-		set batonometry;
+  data batonometry_checkpwa batonometry_pwa_ap_err batonometry_pwa_aix_err;
+    set batonometry;
 
-		if substr(folder,12,3) = 'PWV' then delete;
+    if substr(folder,12,3) = 'PWV' then delete;
 
-		if operator_index < 80 then delete;
+    if operator_index < 80 then delete;
 
-		if age < 20 then category = 1;
-		else if age > 79 then category = 8;
-		else category = floor(age/10);
+    if age < 20 then category = 1;
+    else if age > 79 then category = 8;
+    else category = floor(age/10);
 
-		if sex = "MALE" then gender = 1; else if sex = "FEMALE" then gender = 2;
+    if sex = "MALE" then gender = 1; else if sex = "FEMALE" then gender = 2;
 
-		if gender = 1
-			then do;
-				if category = 1 then do; if (c_ap > 5 or c_ap < -7) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 2 then do; if (c_ap > 9 or c_ap < -7) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 3 then do; if (c_ap > 14 or c_ap < -6) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 4 then do; if (c_ap > 15 or c_ap < -1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 5 then do; if (c_ap > 19 or c_ap < -1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 6 then do; if (c_ap > 21 or c_ap < 1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 7 then do; if (c_ap > 23 or c_ap < 3) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 8 then do; if (c_ap > 24 or c_ap < 4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				if category = 1 then do; if (c_agph > 14 or c_agph < -14) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 2 then do; if (c_agph > 24 or c_agph < -20) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 3 then do; if (c_agph > 38 or c_agph < -24) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 4 then do; if (c_agph > 39 or c_agph < -1) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 5 then do; if (c_agph > 44 or c_agph < 4) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 6 then do; if (c_agph > 46 or c_agph < 10) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 7 then do; if (c_agph > 48 or c_agph < 12) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 8 then do; if (c_agph > 50 or c_agph < 20) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-			end;
-		else if gender = 2
-			then do;
-				if category = 1 then do; if (c_ap > 7 or c_ap < -5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 2 then do; if (c_ap > 11 or c_ap < -5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 3 then do; if (c_ap > 16 or c_ap < -4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 4 then do; if (c_ap > 20 or c_ap < 0) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 5 then do; if (c_ap > 23 or c_ap < 3) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 6 then do; if (c_ap > 25 or c_ap < 5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 7 then do; if (c_ap > 26 or c_ap < 6) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				else if category = 8 then do; if (c_ap > 32 or c_ap < 4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
-				if category = 1 then do; if (c_agph > 25 or c_agph < -15) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 2 then do; if (c_agph > 37 or c_agph < -19) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 3 then do; if (c_agph > 44 or c_agph < -4) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 4 then do; if (c_agph > 48 or c_agph < 8) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 5 then do; if (c_agph > 51 or c_agph < 15) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 6 then do; if (c_agph > 52 or c_agph < 16) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 7 then do; if (c_agph > 53 or c_agph < 17) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-				else if category = 8 then do; if (c_agph > 55 or c_agph < 19) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
-			end;
+    if gender = 1
+      then do;
+        if category = 1 then do; if (c_ap > 5 or c_ap < -7) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 2 then do; if (c_ap > 9 or c_ap < -7) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 3 then do; if (c_ap > 14 or c_ap < -6) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 4 then do; if (c_ap > 15 or c_ap < -1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 5 then do; if (c_ap > 19 or c_ap < -1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 6 then do; if (c_ap > 21 or c_ap < 1) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 7 then do; if (c_ap > 23 or c_ap < 3) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 8 then do; if (c_ap > 24 or c_ap < 4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        if category = 1 then do; if (c_agph > 14 or c_agph < -14) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 2 then do; if (c_agph > 24 or c_agph < -20) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 3 then do; if (c_agph > 38 or c_agph < -24) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 4 then do; if (c_agph > 39 or c_agph < -1) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 5 then do; if (c_agph > 44 or c_agph < 4) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 6 then do; if (c_agph > 46 or c_agph < 10) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 7 then do; if (c_agph > 48 or c_agph < 12) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 8 then do; if (c_agph > 50 or c_agph < 20) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+      end;
+    else if gender = 2
+      then do;
+        if category = 1 then do; if (c_ap > 7 or c_ap < -5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 2 then do; if (c_ap > 11 or c_ap < -5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 3 then do; if (c_ap > 16 or c_ap < -4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 4 then do; if (c_ap > 20 or c_ap < 0) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 5 then do; if (c_ap > 23 or c_ap < 3) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 6 then do; if (c_ap > 25 or c_ap < 5) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 7 then do; if (c_ap > 26 or c_ap < 6) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        else if category = 8 then do; if (c_ap > 32 or c_ap < 4) then output batonometry_pwa_ap_err; else output batonometry_checkpwa; end;
+        if category = 1 then do; if (c_agph > 25 or c_agph < -15) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 2 then do; if (c_agph > 37 or c_agph < -19) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 3 then do; if (c_agph > 44 or c_agph < -4) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 4 then do; if (c_agph > 48 or c_agph < 8) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 5 then do; if (c_agph > 51 or c_agph < 15) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 6 then do; if (c_agph > 52 or c_agph < 16) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 7 then do; if (c_agph > 53 or c_agph < 17) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+        else if category = 8 then do; if (c_agph > 55 or c_agph < 19) then output batonometry_pwa_aix_err; else output batonometry_checkpwa; end;
+      end;
 
   drop px_dist--b_ecg_qc_blv;
 
-	run;
+  run;
   *eliminate duplicates for pwa;
   proc sort data = batonometry_checkpwa nodupkey;
     by studyid timepoint datetime;
@@ -193,11 +193,11 @@ x net use y: "\\rfa01\BWH-SleepEpi-bestair\Data\Tonometry\Scored" /P:No;
 ***************************************************************************************;
 
   *if not running as part of "update and check outcome variables.sas", uncomment next datastep;
-  /*
+/* 
   data redcap;
     set bestair.baredcap;
   run;
-  */
+ */ 
 
 
   data redcap_tonom;
@@ -246,4 +246,8 @@ x net use y: "\\rfa01\BWH-SleepEpi-bestair\Data\Tonometry\Scored" /P:No;
     if qctonom_studyid > 0 then output tonom_in;
     if qctonom_studyid > 0 and (qctonom_pwv1 < 0 or qctonom_pwv1 = . or qctonom_augix1 < 0 or qctonom_augix1 = .) then output missingcheck_tonom;
 
+  run;
+
+  data bestair.bestairtonometry_raw bestair2.bestairtonometry_raw_&sasfiledate;
+    set batonometry;
   run;

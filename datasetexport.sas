@@ -1033,6 +1033,7 @@ data bestair_master;
   if shq_highbpage < 0 then shq_highbpage = .;
   if shq_highcholesage < 0 then shq_highcholesage = .;
   if shq_eversmokeagestart < 0 then shq_eversmokeagestart = .;
+  if shq_eversmokeeachday < 0 then shq_eversmokeeachday = .;
 
 run;
 

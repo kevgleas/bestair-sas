@@ -1038,6 +1038,7 @@ data bestair_master;
   if shq_smokenow < 0 then then shq_smokenow = .;
   if shq_ovariesremov < 0 then shq_ovariesremov = .;
   if shq_hysterectomyage < 0 then shq_hysterectomyage = .;
+  if shq_menstrualnumber < 0 then shq_menstrualnumber = .;
 
 run;
 

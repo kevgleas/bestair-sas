@@ -1043,6 +1043,7 @@ data bestair_master;
   if shq_hormonertagestop < 0 then shq_hormonertagestop = .;
   if shq_nap5min6 < 0 then shq_nap5min6 = .;
   if shq_cigperday6 < 0 then shq_cigperday6 = .;
+  if qctonom_map_pwv < 0 then qctonom_map_pwv = '';
 
 run;
 

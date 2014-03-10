@@ -1046,6 +1046,7 @@ data bestair_master;
   if qctonom_map_pwv < 0 then qctonom_map_pwv = '';
   if qctonom_proximaldistance1 < 0 then qctonom_proximaldistance1 = .;
   if qctonom_proximaldistance2 < 0 then qctonom_proximaldistance2 = .;
+  if qctonom_proximaldistance3 < 0 then qctonom_proximaldistance3 = .;
 
 run;
 

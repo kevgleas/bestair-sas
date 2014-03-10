@@ -1021,6 +1021,7 @@ data bestair_master;
   if qctonom_augix1 < 0 then qctonom_augix1 = .;
   if qctonom_augix2 < 0 then qctonom_augix2 = .;
   if qctonom_aix3 < 0 then qctonom_aix3 = .;
+  if qctonom_aix4 < 0 then qctonom_aix4 = .;
 
 run;
 

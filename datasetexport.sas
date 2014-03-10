@@ -1055,6 +1055,7 @@ data bestair_master;
   if qctonom_map1 < 0 then qctonom_map1 = .;
   if qctonom_augpress1 < 0 then qctonom_augpress1 = .;
   if qctonom_augpress2 < 0 then qctonom_augpress2 = .;
+  if qctonom_augpress3 < 0 then qctonom_augpress3 = .;
 
 run;
 

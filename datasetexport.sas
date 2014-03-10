@@ -1029,6 +1029,7 @@ data bestair_master;
   if anth_waistcm3 < 0 then anth_waistcm3 = .;
   if bplog_pulse< 0 then bplog_pulse = .;
   if shq_nap5min < 0 then shq_nap5min = .;
+  if shq_diabetesage < 0 then shq_diabetesage = .;
 
 run;
 

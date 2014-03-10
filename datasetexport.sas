@@ -1036,6 +1036,7 @@ data bestair_master;
   if shq_eversmokeeachday < 0 then shq_eversmokeeachday = .;
   if shq_eversmokeoldstop < 0 then shq_eversmokeoldstop = .;
   if shq_smokenow < 0 then then shq_smokenow = .;
+  if shq_ovariesremov < 0 then shq_ovariesremov = .;
 
 run;
 

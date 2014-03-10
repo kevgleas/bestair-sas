@@ -1031,6 +1031,7 @@ data bestair_master;
   if shq_nap5min < 0 then shq_nap5min = .;
   if shq_diabetesage < 0 then shq_diabetesage = .;
   if shq_highbpage < 0 then shq_highbpage = .;
+  if shq_highcholesage < 0 then shq_highcholesage = .;
 
 run;
 

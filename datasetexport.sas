@@ -1022,6 +1022,7 @@ data bestair_master;
   if qctonom_augix2 < 0 then qctonom_augix2 = .;
   if qctonom_aix3 < 0 then qctonom_aix3 = .;
   if qctonom_aix4 < 0 then qctonom_aix4 = .;
+  if elig_berlinscore < 0 then elig_berlinscore = .;
 
 run;
 

@@ -1051,6 +1051,7 @@ data bestair_master;
   if qctonom_distaldistance1 < 0 then qctonom_distaldistance1 = .;
   if qctonom_distaldistance2 < 0 then qctonom_distaldistance2 = .;
   if qctonom_distaldistance3 < 0 then qctonom_distaldistance3 = .;
+  if qctonom_distaldistanc2_f1a < 0 then qctonom_distaldistanc2_f1a = .;
 
 run;
 

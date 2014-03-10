@@ -1040,6 +1040,7 @@ data bestair_master;
   if shq_hysterectomyage < 0 then shq_hysterectomyage = .;
   if shq_menstrualnumber < 0 then shq_menstrualnumber = .;
   if shq_hormonertagestart < 0 then shq_hormonertagestart = .;
+  if shq_hormonertagestop < 0 then shq_hormonertagestop = .;
 
 run;
 

@@ -1042,6 +1042,7 @@ data bestair_master;
   if shq_hormonertagestart < 0 then shq_hormonertagestart = .;
   if shq_hormonertagestop < 0 then shq_hormonertagestop = .;
   if shq_nap5min6 < 0 then shq_nap5min6 = .;
+  if shq_cigperday6 < 0 then shq_cigperday6 = .;
 
 run;
 

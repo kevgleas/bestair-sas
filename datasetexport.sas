@@ -1024,6 +1024,7 @@ data bestair_master;
   if qctonom_aix4 < 0 then qctonom_aix4 = .;
   if elig_berlinscore < 0 then elig_berlinscore = .;
   if elig_excl09epworthscore < 0 then elig_excl09epworthscore = .;
+  if anth_waistcm1 < 0 then anth_waistcm1 = .;
 
 run;
 

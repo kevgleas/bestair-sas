@@ -62,3 +62,39 @@ if &dateoftimepoint ne . and &dateofbirth ne .
   %end;
 
 %mend create_emptydataset_ifmissing;
+
+***********************************************;
+* Macros Check Values of Variables
+***********************************************;
+
+  ***** Print Lists of Variables that are either "NULL" or "non-NULL". Variable names have been storedin array-style variables (e.g. var1-var27)*****;
+  *change prefix based on array; *null_value changed based on variable type; *options for null test are '=' or 'ne';
+  %macro printlists_ofvars_basedonnull(datasetname=, id_var=elig_studyid, timepoint_var=redcap_event_name, prefix=var, num_ofvars=, null_value=., null_test=%str(=));
+    %do i = 1 %to &num_ofvars;
+      proc sql;
+        select &id_var, &timepoint_var, &prefix&i
+        from &datasetname
+        where &prefix&i &null_test &null_value;
+      quit;
+    %end;
+  %mend printlists_ofvars_basedonnull;
+
+  ***** Create Table of Variables that are either "NULL" or "non-NULL". Variable names have been storedin array-style variables (e.g. var1-var27)*****;
+  *change prefix based on array; *null_value changed based on variable type; *options for null test are '=' or 'ne';
+  %macro createtable_ofvars_basedonnull(datasetname=, tablename=, id_var=elig_studyid, timepoint_var=redcap_event_name, prefix=var, num_ofvars=, null_value=., null_test=%str(=));
+
+    *%create_emptydataset_ifmissing(&tablename, &id_var);
+    proc sql noprint;
+      create table &tablename
+      (&id_var NUM, &timepoint_var CHAR(32), Variable_Name CHAR(32));
+    quit;
+
+    %do i = 1 %to &num_ofvars;
+      proc sql noprint;
+        insert into work.&tablename
+        select &id_var, &timepoint_var, &prefix&i as Variable_Name
+        from &datasetname
+        where &prefix&i &null_test &null_value;
+      quit;
+    %end;
+  %mend createtable_ofvars_basedonnull;

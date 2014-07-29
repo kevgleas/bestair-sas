@@ -147,9 +147,9 @@
   data visit_counts;
     set crfs_withbptonom;
 
-    format  bl_allcount bl_crfcount bl_bloodcount bl_bpcount bl_tonomcount 
-            mo6_allcount mo6_crfcount mo6_bloodcount mo6_bpcount mo6_tonomcount 
-            mo12_allcount mo12_crfcount mo12_bloodcount mo12_bpcount mo12_tonomcount 
+    format  bl_allcount bl_crfcount bl_bloodcount bl_bpcount bl_tonomcount
+            mo6_allcount mo6_crfcount mo6_bloodcount mo6_bpcount mo6_tonomcount
+            mo12_allcount mo12_crfcount mo12_bloodcount mo12_bpcount mo12_tonomcount
             final_allcount final_crfcount final_bloodcount final_bpcount final_tonomcount 3.;
 
     if timepoint = 00 then do;
@@ -180,7 +180,7 @@
         final_tonomcount = 1;
     end;
 
-  
+
 *calculates bpcount based on non-pending data: hasbp + knownmissing + neverhadvisit + visitdate_earlier_than_oldestpending;
 * as of 11/21/13, oldest pending is 12-month data for 73250 whose visit date was 09/09/13 (SAS_DATE = 19610);
 
@@ -254,7 +254,7 @@
     visit_type = "12 Month";
 
   run;
-  
+
   data final_countsums (keep = timepoint visit_type allcount crfcount bloodcount bpcount tonomcount);
     retain visit_type timepoint;
     set visit_countsums;
@@ -384,7 +384,7 @@
 
   run;
 
-  
+
 
   proc means noprint data = bp_compfinalv;
     output out = bp_compstatsfinalv sum(comp_bp) = comp_bp sum(part_bp) = part_bp sum(miss_bp) = miss_bp;
@@ -710,7 +710,7 @@
       pctcomp_echoresolved = echo_comp / tonomcount;
       end;
     else if timepoint = 12 then do;
-      echo_comp = 72;   /*missing: 73068, 73093, 73119, 80024, 82444, 84175*/ /*check 91396 - currently marked missing because we need images still*/
+      echo_comp = 73;   /*missing: 73068, 73093, 73119, 80024, 82444, 84175, 91396*/ /*addtional follow-up echoes not counted for 73474 (9-month) and 87145 (6-month)*/
       pctcomp_echoresolved = echo_comp / tonomcount;
       end;
 

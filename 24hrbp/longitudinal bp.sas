@@ -68,6 +68,7 @@
   data longitudinal_bp;
     set longbp_withrand;
 
+		invalid_baseline = 0;
     all_data = .;
     atleast1_complong = .;
     atleast1_partlong = .;

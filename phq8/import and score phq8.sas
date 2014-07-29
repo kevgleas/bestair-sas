@@ -62,21 +62,39 @@
   run;
 
   *eliminate observations with missing PHQ-8 data from dataset that will be additionally processed;
-
+/*
   proc sql;
   delete
   from baphq
   where phq8_interest < 0 or phq8_down_hopeless < 0 or phq8_sleep < 0 or phq8_tired < 0 or phq8_appetite < 0
       or phq8_bad_failure < 0 or phq8_troubleconcentrating < 0 or phq8_movingslowly < 0;
   quit;
+*/
+
 
 ***************************************************************************************;
 * EXPORT AND QUALITY CHECK OBSERVATIONS WITH COMPLETE PHQ-8 DATA
 ***************************************************************************************;
 
-  data bestair.bestairphq8 bestair2.bestairphq8_&sasfiledate;
+  data baphq_final;
     set baphq;
+
     phq8_calc_total = sum(of phq8_interest--phq8_movingslowly);
+
+    array phq8array(8) phq8_interest--phq8_movingslowly;
+
+    do i=1 to 8;
+      if phq8array(i) < 0 then do;
+        phq8array[i] = .;
+        phq8_total = .;
+        phq8_calc_total = .;
+      end;
+    end;
+    drop i;
+  run;
+
+  data bestair.bestairphq8 bestair2.bestairphq8_&sasfiledate;
+    set baphq_final;
   run;
 
   *validate overall score of PHQ-8 by comparing reported score to calculated sum of individual questions;

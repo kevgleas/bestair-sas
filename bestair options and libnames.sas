@@ -22,7 +22,9 @@ options source nodate nonumber nofmterr formdlim = ' ' /*fmtsearch = (bestair)*/
 %let bestairpath = \\rfa01\bwh-sleepepi-bestair\Data;
 libname bestair "&bestairpath.\SAS\_datasets";
 libname bestair2 "&bestairpath.\SAS\_archive";
-  
+libname bestdsmb "&bestairpath.\SAS\_datasets_dsmb_2014apr";
+libname bestats "&bestairpath.\SAS\_datasets_ats_2014may";
+
 
 *Create format dataset;
 *Only perform one time from operating environment that created formats unless formats are modified;

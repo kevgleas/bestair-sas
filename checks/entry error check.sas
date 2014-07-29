@@ -282,8 +282,6 @@
 
   run;
 
-
-
   proc sql;
   ods pdf file="\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\BestAIR Possible Entry or Collection Errors &sasfiledate..PDF";
 
@@ -298,7 +296,8 @@
 
     title 'Instances Where Visit Date was Possibly Entered Incorrectly';
     select elig_studyid as StudyID, anth_namecode as Namecode, timepoint, var_error as Mistake_Variable from visitdate_errors
-    where elig_studyid ne 73088;  /*verified KG 11/04/13*/
+    where (elig_studyid ne 73088) and /*verified KG 11/04/13*/
+          (elig_studyid ne 84140);
     title;
 
     title 'Instances Where Study Visit (Timepoint) was Entered Incorrectly';
@@ -311,6 +310,7 @@
     select elig_studyid from anthheights1 where big_htdiff = 1;
     title;
 
+    *NULL 12-month data for 80045 in final dataset;
     title 'Instances Where Reported Anthro. Height is Less than 150 cm';
     select elig_studyid, timepoint from visits_only where (0 < anth_heightcm1 < 150) or (0 < anth_heightcm2 < 150) or (0 < anth_heightcm3 < 150);
     title;
@@ -325,7 +325,7 @@
     title;
 
     title 'Instances Where Reported Neck Circumference is Less than 35 cm';
-    select elig_studyid, timepoint from visits_only where (0 < anth_waistcm1 < 35) or (0 < anth_waistcm2 < 35) or (0 < anth_waistcm3 < 35);
+    select elig_studyid, timepoint from visits_only where (0 < anth_neckcm1 < 35) or (0 < anth_neckcm2 < 35) or (0 < anth_neckcm3 < 35);
     title;
 
     title 'Instances Where Reported Waist Circumference is Less than 70 cm';

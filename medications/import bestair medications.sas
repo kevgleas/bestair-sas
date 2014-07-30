@@ -70,6 +70,116 @@
     delete from medications where med_studyid = .;
   quit;
   */
+ 
+***************************************************************************************;
+* DETERMINE VISIT DATES (TO BE USED IN CALCULATING WHETHER MEDS WERE TAKEN AT TIMEPOINT)
+***************************************************************************************;
+
+  *determine best date to use for "visitdate" for each timepoint;
+  data store_visitdates;
+    set redcap_rand (where = (redcap_event_name in("00_bv_arm_1", "06_fu_arm_1", "12_fu_arm_1")));
+
+    if redcap_event_name = "00_bv_arm_1" then timepoint = 0;
+    else if redcap_event_name = "06_fu_arm_1" then timepoint = 6;
+    else if redcap_event_name = "12_fu_arm_1" then timepoint = 12;
+
+    format timepoint_date YYMMDD10.;
+
+    *create array of several visitdate variables in ascending order of likely accuracy of actual visitdate;
+    array decide_visitdate[*] bplog_visitdate sf36_visitdate prom_visitdate phq8_visitdate
+                              cal_datecompleted qctonom_visitdate bprp_visitdate anth_date;
+
+    *set timepoint_date equal to value of visitdate variable most likely to be accurate;
+    do i = 1 to dim(decide_visitdate);
+      if decide_visitdate[i] ne . then timepoint_date = decide_visitdate[i];
+    end;
+
+
+    keep elig_studyid redcap_event_name bplog_visitdate sf36_visitdate prom_visitdate phq8_visitdate
+          cal_datecompleted qctonom_visitdate bprp_visitdate anth_date timepoint timepoint_date;
+  run;
+
+  data baselinedates mo6dates mo12dates;
+    set store_visitdates;
+    if timepoint = 0 then output baselinedates;
+    else if timepoint = 6 then output mo6dates;
+    else if timepoint = 12 then output mo12dates;
+  run;
+
+  data baselinedates;
+    set baselinedates (keep = elig_studyid timepoint_date);
+    rename timepoint_date = baseline_date;
+  run;
+
+  data mo6dates;
+    set mo6dates (keep = elig_studyid timepoint_date);
+    rename timepoint_date = sixmonth_date;
+  run;
+
+  data mo12dates;
+    set mo12dates (keep = elig_studyid timepoint_date);
+    rename timepoint_date = twelvemonth_date;
+  run;
+
+  *this should be the dataset used instead of "dates" later in program;
+  data all_visitdates;
+    merge baselinedates mo6dates mo12dates;
+    by elig_studyid;
+    *if participant skipped 6-month but had 12-month data, then set 6-month "date" to 6-months from baseline;
+    if sixmonth_date = . and twelvemonth_date ne . then sixmonth_date = baseline_date + ceil(365.25/2);
+  run;
+
+  data medications_withvisitdates;
+    merge randset all_visitdates medications (in = meds_reported);
+    by elig_studyid;
+    if meds_reported;
+  run;
+
+  data meds_denotechanges_postrand;
+    set medications_withvisitdates;
+
+    medchange_noted = 0;
+
+    array medstartdates[60] med_startdate01-med_startdate60;
+    array medenddates[60] med_enddate01-med_enddate60;
+
+    do i = 1 to 60;
+      if baselinedate < medstartdates[i] le mo6date then medchange_after00_before06 = 1;
+      else if mo6date < medstartdates[i] le mo12date then medchange_after06_before12 = 1;
+    end;
+
+    do j = 1 to 60;
+      if baselinedate < medenddates[j] le mo6date then medchange_after00_before06 = 1;
+      else if mo6date < medenddates[j] le mo12date then medchange_after06_before12 = 1;
+    end;
+
+    drop i j;
+
+    if medchange_after00_before06 ne 1 and medchange_after06_before12 ne 1 then nomedchange_since00 = 1;
+
+  run;
+
+  proc sql noprint;
+    select elig_studyid into :studyids_nomedchanges
+    separated by ' , '
+    from meds_denotechanges_postrand
+    where nomedchange_since00 = 1;
+
+    select elig_studyid into :studyids_withmedchanges
+    separated by ' , '
+    from meds_denotechanges_postrand
+    where nomedchange_since00 ne 1;
+  quit;
+
+
+  data dates;
+    set all_visitdates;
+    rename baseline_date = baseline;
+    rename sixmonth_date = sixmonth;
+    rename twelvemonth_date = twelvemonth;
+  run;
+
+
 	data medications2;
 		set medications;
 

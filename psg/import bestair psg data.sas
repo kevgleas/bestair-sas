@@ -254,9 +254,6 @@
     * store the number of records read in from the network to report later for easy checking;
     call symput('filecount2',_n_);
 
-    drop filename;
-  run;
-
   ************************************************************************************;
   * #1 WAKE TIME AFTER SLEEP ONSET
   ************************************************************************************;
@@ -279,32 +276,32 @@
 
   ************************************************************************************;
   * #9 RDI
-  * RDI at specified desat  
+  * RDI at specified desat
       [ (Total number of central apneas at specified desat)
       + (Total number of obstructive apneas at specified desat)
-      + (hypopneas at specified desat)] 
+      + (hypopneas at specified desat)]
       / (hours of sleep)
   * For all, exclude if total sleep time is zero;
   * For Profusion2 studies, include AASM hypopneas ('unsure events');
   ************************************************************************************;
     if slpprdp gt 0 then do;
-      ahi_a0h0 = 60*(hrembp + hrop + hnrbp + hnrop + 
+      ahi_a0h0 = 60*(hrembp + hrop + hnrbp + hnrop +
             carbp + carop + canbp + canop +
             oarbp + oarop + oanbp +oanop +
             urbp + urop + unrbp + unrop) / slpprdp;
-        ahi_a2h2 = 60*(hrembp2 + hrop2 + hnrbp2 + hnrop2 + 
+        ahi_a2h2 = 60*(hrembp2 + hrop2 + hnrbp2 + hnrop2 +
             carbp2 + carop2 + canbp2 + canop2 +
             oarbp2 + oarop2 + oanbp2 +oanop2 +
             urbp2 + urop2 + unrbp2 + unrop2) / slpprdp;
-        ahi_a3h3 = 60*(hrembp3 + hrop3 + hnrbp3 + hnrop3 + 
+        ahi_a3h3 = 60*(hrembp3 + hrop3 + hnrbp3 + hnrop3 +
             carbp3 + carop3 + canbp3 + canop3 +
             oarbp3 + oarop3 + oanbp3 + oanop3 +
             urbp3 + urop3 + unrbp3 + unrop3) / slpprdp;
-        ahi_a4h4 = 60*(hrembp4 + hrop4 + hnrbp4 + hnrop4 + 
+        ahi_a4h4 = 60*(hrembp4 + hrop4 + hnrbp4 + hnrop4 +
             carbp4 + carop4 + canbp4 + canop4 +
             oarbp4 + oarop4 + oanbp4 +oanop4 +
             urbp4 + urop4 + unrbp4 + unrop4) / slpprdp;
-      ahi_a5h5 = 60*(hrembp5 + hrop5 + hnrbp5 + hnrop5 + 
+      ahi_a5h5 = 60*(hrembp5 + hrop5 + hnrbp5 + hnrop5 +
             carbp5 + carop5 + canbp5 + canop5 +
             oarbp5 + oarop5 + oanbp5 +oanop5 +
             urbp5 + urop5 + unrbp5 + unrop5) / slpprdp;
@@ -443,7 +440,7 @@
   proc sort data=bestair_in;
     by studyid stdydt;
   run;
-  
+
   *********************** IMPORT REDCAP Data *******************************;
   **************************************************************************;
   %include "&bestairpath\SAS\redcap\_components\bestair create rand set.sas";
@@ -570,4 +567,203 @@
     end;
 
     drop i;
+  run;
+
+  proc sql noprint;
+    create table bestair_cleanemblettavars2 as
+    select stdydt as recording_date, *
+    from bestair_cleanemblettavars
+    order by studyid, recording_date;
+  quit;
+
+  proc sql noprint;
+    create table Redcap_embletta_withrand2 as
+    select elig_studyid as studyid, embqs_date_study_recorded as recording_date, *
+    from Redcap_embletta_withrand
+    order by studyid, recording_date;
+  quit;
+
+  data psg_redcapmatch_orshc psg_missredcap redcap_nopsgmatch;
+    retain studyid;
+    format psgpurpose psgpurposef.;
+    label psgpurpose = "PSG Purpose (0 = Screening; 1 = Final Visit)";
+    retain recording_date;
+    merge Redcap_embletta_withrand2 (in = a drop = elig_studyid) bestair_cleanemblettavars2 (in = b drop = screening);
+    by studyid recording_date;
+
+    psgpurpose = max(of import_psgpurpose redcap_psgpurpose);
+
+    if shc = 1 then output psg_redcapmatch_orshc;
+    else if a and b then output psg_redcapmatch_orshc;
+    else if b then output psg_missredcap;
+    else if a then output redcap_nopsgmatch;
+  run;
+
+  proc sql noprint;
+    select studyid into :missing_redcapqs separated by ', '
+    from psg_missredcap;
+  quit;
+
+  data checkfor_wrongimport;
+    set psg_missredcap redcap_nopsgmatch;
+    if studyid in (&missing_redcapqs);
+  run;
+
+  proc sort data = checkfor_wrongimport;
+    by studyid psgpurpose;
+  run;
+
+  data checkfor_wrongimport;
+    set checkfor_wrongimport;
+    by studyid psgpurpose;
+    if (first.psgpurpose and not last.psgpurpose) or (last.psgpurpose and not first.psgpurpose) or (not last.psgpurpose and not first.psgpurpose);
+  run;
+
+  proc sql;
+    title 'Check for PSG being exported to SAS Reports';
+    select distinct studyid,  psgpurpose, max(stdydt) format = mmddyy. label = "PSG Import Recording Date", max(AHIU3),
+                              max(embqs_date_study_recorded) format = mmddyy. label = "REDCap Recording Date", max(embqs_ahi) label = "REDCap AHI"
+    from checkfor_wrongimport
+    group by studyid
+    ;
+  quit;
+
+
+  data bestair_psgall;
+    merge psg_redcapmatch_orshc psg_missredcap;
+    by studyid recording_date;
+  run;
+
+  proc sql noprint;
+
+    select distinct studyid into :missingqs_fordate separated by ', '
+    from bestair_psgall
+    group by studyid
+    having (stdydt = . and embletta = 1 and embqs_date_study_recorded ne .) OR (stdydt ne . and embqs_date_study_recorded = . and embletta = 1);
+
+    select distinct studyid into :nomatchingpsg_forqs separated by ', '
+    from bestair_psgall
+    group by studyid
+    having (embqs_date_study_recorded ne . and stdydt = .);
+
+  quit;
+
+  data checkqs_forid;
+    set bestair_psgall;
+    if studyid in (&missingqs_fordate);
+  run;
+
+  data checkpsg_forid;
+    set bestair_psgall;
+    if studyid in (&nomatchingpsg_forqs);
+  run;
+
+  proc sql ;
+
+    title 'Embletta: No Embletta QS entered in REDCap for PSG imported into Dataset';
+    select studyid, stdydt, embqs_date_study_recorded
+    from bestair_psgall
+    where (stdydt = . and embletta = 1 and embqs_date_study_recorded ne .) OR (stdydt ne . and embqs_date_study_recorded = . and embletta = 1);
+
+    title 'No matching PSG for REDCap form';
+    select studyid, stdydt, embqs_date_study_recorded
+    from bestair_psgall
+    where (embqs_date_study_recorded ne . and stdydt = . and studyid not in(&toomanypsgs));
+
+  quit;
+
+  data rand_eligahi;
+    set bestair.bestaireligibility;
+    if randomized = 1;
+    psgpurpose = 0;
+    keep elig_studyid psgpurpose elig_incl03osaahi--elig_incl03osa4 randomized;
+  run;
+
+  data bestair_psg_addedvars;
+    merge bestair_psgall rand_eligahi (rename = (elig_studyid = studyid));
+    by studyid psgpurpose;
+
+
+    if ahiu3 ne . then do;
+      ahi_primary = ahiu3;
+      ahi_primary_source = 1;
+    end;
+    else if elig_incl03osa4 = 1 and elig_incl03osa3 = 0 then do;
+      ahi_primary = elig_incl03osaahi*1.25;
+      ahi_primary_source = 4;
+    end;
+    else do;
+      ahi_primary = elig_incl03osaahi;
+      ahi_primary_source = 3;
+    end;
+
+    if ahi_primary = . then do;
+      ahi_primary = embqs_ahi;
+      ahi_primary_source = 9;
+    end;
+
+    if ahi_primary ge 30 then ahi_primary_ge30 = 1;
+    else if ahi_primary ne . then ahi_primary_ge30 = 0;
+
+
+    if studyid in(&randomized_list) then randomized = 1;
+
+    format ahi_primary_source ahisourcef. ahi_primary_ge30 yesnof.;
+
+    drop rand_date embletta_qs_complete redcap_psgpurpose import_psgpurpose;
+  run;
+/*
+  proc sql;
+    title "";
+    select studyid, psgpurpose, elig_incl03osaahi, embqs_ahi, AHIU3, ahi_a0h3
+    from bestair_psg_addedvars
+    where abs(elig_incl03osaahi - embqs_ahi) ge 1;
+  quit;
+
+  proc sql;
+    select studyid, psgpurpose, elig_incl03osaahi, elig_incl03osa3, elig_incl03osa4, ahi_primary
+    from bestair_psg_addedvars
+    where embletta = . and ahiu3 = .;
+  quit;
+
+  proc sql;
+    select studyid, psgpurpose, embletta, ahiu3,elig_incl03osaahi, elig_incl03osa3, elig_incl03osa4, ahi_primary
+    from bestair_psg_addedvars
+    where abs(ahiu3-elig_incl03osaahi) ge 1;
+  quit;
+*/
+/**/
+/*  data random_baselinepsg;*/
+/*    set bestair_psg_addedvars;*/
+/*    if randomized = 1 and psgpurpose = 0;*/
+/*  run;*/
+
+  data bestair_psgfinal;
+    format studyid best12. randomized yesnof. final_visit best12.;
+    label randomized = "Was Pt. Randomized?";
+    label final_visit = "Expected Final Visit";
+    merge bestair_psg_addedvars (in = a) bestair.bamedicationcat(keep = elig_studyid final_visit rename = (elig_studyid=studyid));
+    by studyid;
+    if a;
+
+    drop elig_incl03osaahi--elig_incl03osa4;
+  run;
+
+  %let bestairpsg_datasetname = bestair_psgfinal;
+  %include "&bestairpath\sas\psg\bestair psg labels.sas";
+
+  data bestair.bestairpsg bestair2.bestairpsg_&sasfiledate;
+    set bestair_psgfinal;
+  run;
+
+/*
+  proc contents data = bestair_psgfinal out = bestairpsg_contents;
+  run;
+
+  data bestairpsg_contents;
+    set bestairpsg_contents;
+    keep NAME--NOBS;
+  run;
+
+  proc export data = bestairpsg_contents outfile = "\\rfa01\bwh-sleepepi-home\users\public\bestair_psgdata_contents_2014-03-12.csv" dbms = csv replace;
   run;

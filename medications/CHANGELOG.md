@@ -10,6 +10,10 @@
 ### Changes
 
   - import bestair medications.sas
+    - Create dataset of randomized pts to improve speed.
+    - Check for meds entered in wrong place/never entered.
+    - Update source for main medications dataset.
+    - Add timepoint date calculations.
     - Include macros stored in another program.
     - Create main dataset from premedications.
     - Efficiently rename med time variables using macro.

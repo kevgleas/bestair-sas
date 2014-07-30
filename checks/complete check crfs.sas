@@ -98,11 +98,11 @@
   run;
 
   *exclude pending visits from calculation (6-month visit timepoint is created in REDCap at time of 6-month phone call);
-  data crfs2;
-    merge crfs2 (in = a) pending_visits (in = b keep = elig_studyid timepoint);
-    by elig_studyid timepoint;
-    if not b;
-  run;
+/*  data crfs2;*/
+/*    merge crfs2 (in = a) pending_visits (in = b keep = elig_studyid timepoint);*/
+/*    by elig_studyid timepoint;*/
+/*    if not b;*/
+/*  run;*/
 
 ****************************************************************************************;
 * IMPORT AND PROCESS RAW FILES FROM RFA SERVER
@@ -143,7 +143,6 @@
     by elig_studyid timepoint;
   run;
 
-
   data visit_counts;
     set crfs_withbptonom;
 
@@ -154,6 +153,7 @@
 
     if timepoint = 00 then do;
         bl_allcount = 1;
+        bl_bpcount = 1;
         bl_crfcount = 1;
         bl_bloodcount = 1;
         bl_tonomcount = 1;
@@ -161,6 +161,7 @@
 
     if timepoint = 06 then do;
         mo6_allcount = 1;
+        mo6_bpcount = 1;
         mo6_crfcount = 1;
         if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then mo6_bloodcount = 1;
         mo6_tonomcount = 1;
@@ -169,12 +170,14 @@
     if timepoint = 12 then do;
         mo12_allcount = 1;
         mo12_crfcount = 1;
+        mo12_bpcount = 1;
         if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then mo12_bloodcount = 1;
         mo12_tonomcount = 1;
     end;
 
     if is_final = 1 then do;
         final_allcount = 1;
+        final_bpcount = 1;
         final_crfcount = 1;
         if bloods_totalchol ne . or bloods_triglyc ne . or bloods_serumgluc ne . or (anth_date = . or (today() - anth_date) > 14) then final_bloodcount = 1;
         final_tonomcount = 1;
@@ -183,16 +186,17 @@
 
 *calculates bpcount based on non-pending data: hasbp + knownmissing + neverhadvisit + visitdate_earlier_than_oldestpending;
 * as of 11/21/13, oldest pending is 12-month data for 73250 whose visit date was 09/09/13 (SAS_DATE = 19610);
+    *as of 3/07/14, only 74404 6-month data is pending - assume it's collected;
 
-    if nreadings ne . or monitorqc_studyid = -9 or
-        (anth_studyid in(.,-9) and bprp_studyid in(.,-9) and bloods_studyid in(.,-9) and sphyg_pwv1 in(.,-9) and sphyg_augix1 in(.,-9)) or
-        anth_date < 19610
-      then do;
-        if timepoint = 00 then bl_bpcount = 1;
-        if timepoint = 06 then mo6_bpcount = 1;
-        if timepoint = 12 then mo12_bpcount = 1;
-        if is_final = 1 then final_bpcount = 1;
-      end;
+/*    if nreadings ne . or monitorqc_studyid = -9 or*/
+/*        (anth_studyid in(.,-9) and bprp_studyid in(.,-9) and bloods_studyid in(.,-9) and sphyg_pwv1 in(.,-9) and sphyg_augix1 in(.,-9)) or*/
+/*        anth_date < 19610*/
+/*      then do;*/
+/*        if timepoint = 00 then bl_bpcount = 1;*/
+/*        if timepoint = 06 then mo6_bpcount = 1;*/
+/*        if timepoint = 12 then mo12_bpcount = 1;*/
+/*        if is_final = 1 then final_bpcount = 1;*/
+/*      end;*/
 
 
     keep elig_studyid timepoint bl_allcount--final_tonomcount;
@@ -293,7 +297,14 @@
     part_bp = .;
     miss_bp = .;
 
-    if nsleep ge 4 and nwake ge 10 then
+    *assuming pending participants completes BP;
+    if elig_studyid = 74404 and timepoint = 6 then do;
+            comp_bp = 1;
+            part_bp = 1;
+            miss_bp = 0;
+    end;
+
+    else if nsleep ge 4 and nwake ge 10 then
             do
             comp_bp = 1;
             part_bp = 1;
@@ -698,7 +709,7 @@
 
 
   *echo count manually calculated because of delay in processing;
-  *last counted 11/19/2013;
+  *last counted 3/07/2014;
 
   data ultrasound_compstatsfinal;
     set tonom_compstatsfinal;

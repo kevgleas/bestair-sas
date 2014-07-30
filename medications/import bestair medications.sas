@@ -54,7 +54,7 @@
     title2 "Participant Will be Mistakenly Excluded from Meds Analysis";
     select elig_studyid from missing_medsstudyid;
   quit;
-  
+
   data medications;
     set pre_medications;
     if med_studyid ne .;
@@ -70,7 +70,8 @@
   proc sql;
     delete from medications where med_studyid = .;
   quit;
-  */  
+  */
+
 
 ***************************************************************************************;
 * DETERMINE VISIT DATES (TO BE USED IN CALCULATING WHETHER MEDS WERE TAKEN AT TIMEPOINT)
@@ -284,7 +285,7 @@
     end;
     drop i;
   run;
-  
+
   *list each medication as a separate observation by elig_studyid;
   proc transpose data=medications2 out=wide1;
       by elig_Studyid;
@@ -811,11 +812,32 @@
 
   quit;
 
-*****************************************************************************************;
-* ACE INHIBITOR OR ARB
-*****************************************************************************************;
-  data med_aceinhibitor;
-    set bamed_matched;
+
+
+  data fixed_medtimes;
+    set bamed_matched (where = (baseline le med_enddate or med_enddate = .));
+    array medtimes[*] med_timetakena--med_timetakenc;
+
+    do i = 1 to 3;
+      if medtimes[i] = 0 then medtimes[i] = 2400;
+      if medtimes[i] = 63 then medtimes[i] = 630;
+      else if medtimes[i] = 7.5 then medtimes[i] = 730;
+      else if medtimes[i] < 25 then medtimes[i] = medtimes[i]*100;
+    end;
+
+    do j = 1 to 3;
+      if (medtimes[j] < 30 or medtimes[j] > 2400) and medtimes[j] ne . then timeerror = 1;
+      else if 0 < medtimes[j] < 500 or medtimes[j] ge 2000 then taken_after8pm = 1;
+      else if 500 le medtimes[j] < 1200 then taken_bt5am_Noon = 1;
+      else if 1200 le medtimes[j] < 2000 then taken_btNoon_8pm = 1;
+    end;
+
+    drop i j;
+
+  run;
+
+  data fixed_medtimes;
+    set fixed_medtimes;
 
     if  substr(atccode1,1,4) in ('C09A','C09B','C09C','C09D') or
         substr(atccode2,1,4) in ('C09A','C09B','C09C','C09D') or
@@ -866,26 +888,9 @@
         substr(atccode22,1,7) = 'C10BX04' or
         substr(atccode23,1,7) = 'C10BX04' or
         substr(atccode24,1,7) = 'C10BX04' or
-        substr(atccode25,1,7) = 'C10BX04';
-  run;
+        substr(atccode25,1,7) = 'C10BX04' then aceinhibitor = 1;
+        else aceinhibitor = 0;
 
-  proc sql;
-    create table med_aceinhibitor_count as
-    select elig_studyid, count(elig_studyid) as aceinhibitor_n, timepoint1, timepoint2, timepoint3
-    from med_aceinhibitor
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_aceinhibitor;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* ALPHA BLOCKER
-*****************************************************************************************;
-  data med_alphablocker;
-    set bamed_matched;
     if substr(atccode1,1,5) = 'C02CA' or
         substr(atccode2,1,5) = 'C02CA' or
         substr(atccode3,1,5) = 'C02CA' or
@@ -910,26 +915,9 @@
         substr(atccode22,1,5) = 'C02CA' or
         substr(atccode23,1,5) = 'C02CA' or
         substr(atccode24,1,5) = 'C02CA' or
-        substr(atccode25,1,5) = 'C02CA';
-  run;
+        substr(atccode25,1,5) = 'C02CA' then alphablocker = 1;
+        else alphablocker = 0;
 
-  proc sql;
-    create table med_alphablocker_count as
-    select elig_studyid, count(elig_studyid) as alphablocker_n, timepoint1, timepoint2, timepoint3
-    from med_alphablocker
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_alphablocker;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* ALDOSTERONE BLOCKER -- added 11/20/2012 for Walia/Mehra
-*****************************************************************************************;
-  data med_aldosteroneblocker;
-    set bamed_matched;
     if substr(atccode1,1,5) = 'C03DA' or
         substr(atccode2,1,5) = 'C03DA' or
         substr(atccode3,1,5) = 'C03DA' or
@@ -954,25 +942,9 @@
         substr(atccode22,1,5) = 'C03DA' or
         substr(atccode23,1,5) = 'C03DA' or
         substr(atccode24,1,5) = 'C03DA' or
-        substr(atccode25,1,5) = 'C03DA';
-  run;
+        substr(atccode25,1,5) = 'C03DA' then aldosteroneblocker = 1;
+        else aldosteroneblocker = 0;
 
-  proc sql;
-    create table med_aldosteroneblocker_count as
-    select elig_studyid, count(elig_studyid) as aldosteroneblocker_n, timepoint1, timepoint2, timepoint3
-    from med_aldosteroneblocker
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_aldosteroneblocker;
-    by elig_studyid;
-  run;
-
-*****************************************************************************************;
-* ANTIDEPRESSANT -- added 01/28/2014
-*****************************************************************************************;
-  data med_antidepressant;
-    set bamed_matched;
     if substr(atccode1,1,4) = 'N06A' or
         substr(atccode2,1,4) = 'N06A' or
         substr(atccode3,1,4) = 'N06A' or
@@ -997,27 +969,8 @@
         substr(atccode22,1,4) = 'N06A' or
         substr(atccode23,1,4) = 'N06A' or
         substr(atccode24,1,4) = 'N06A' or
-        substr(atccode24,1,4) = 'N06A';
-  run;
-
-  proc sql;
-    create table med_antidepressant_count as
-    select elig_studyid, count(elig_studyid) as antidepressant_n, timepoint1, timepoint2, timepoint3
-    from med_antidepressant
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_antidepressant;
-    by elig_studyid;
-  run;
-
-
-
-*****************************************************************************************;
-* BETA BLOCKER
-*****************************************************************************************;
-  data med_betablocker;
-    set bamed_matched;
+        substr(atccode24,1,4) = 'N06A' then antidepressant = 1;
+        else antidepressant = 0;
 
     if  substr(atccode1,1,3) = 'C07' or
         substr(atccode2,1,3) = 'C07' or
@@ -1043,26 +996,8 @@
         substr(atccode22,1,3) = 'C07' or
         substr(atccode23,1,3) = 'C07' or
         substr(atccode24,1,3) = 'C07' or
-        substr(atccode25,1,3) = 'C07';
-  run;
-
-  proc sql;
-    create table med_betablocker_count as
-    select elig_studyid, count(elig_studyid) as betablocker_n, timepoint1, timepoint2, timepoint3
-    from med_betablocker
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_betablocker;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* CALCIUM CHANNEL BLOCKER
-*****************************************************************************************;
-  data med_calciumblocker;
-    set bamed_matched;
+        substr(atccode25,1,3) = 'C07' then betablocker = 1;
+        else betablocker = 0;
 
     if substr(atccode1,1,3) = 'C08' or
         substr(atccode2,1,3) = 'C08' or
@@ -1163,27 +1098,8 @@
         substr(atccode22,1,7) in ('C09DX03','C10BX03') or
         substr(atccode23,1,7) in ('C09DX03','C10BX03') or
         substr(atccode24,1,7) in ('C09DX03','C10BX03') or
-        substr(atccode25,1,7) in ('C09DX03','C10BX03');
-  run;
-
-  proc sql;
-    create table med_calciumblocker_count as
-    select elig_studyid, count(elig_studyid) as calciumblocker_n, timepoint1, timepoint2, timepoint3
-    from med_calciumblocker
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_calciumblocker;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* DIURETICS
-*****************************************************************************************;
-
-  data med_diuretics;
-    set bamed_matched;
+        substr(atccode25,1,7) in ('C09DX03','C10BX03') then calciumblocker = 1;
+        else calciumblocker = 0;
 
     if substr(atccode1,1,3) = 'C03' or
         substr(atccode1,1,3) = 'C03' or
@@ -1285,26 +1201,8 @@
         substr(atccode22,1,7) in ('C09DX01','C09DX03') or
         substr(atccode23,1,7) in ('C09DX01','C09DX03') or
         substr(atccode24,1,7) in ('C09DX01','C09DX03') or
-        substr(atccode25,1,7) in ('C09DX01','C09DX03');
-  run;
-
-  proc sql;
-    create table med_diuretics_count as
-    select elig_studyid, count(elig_studyid) as diuretics_n, timepoint1, timepoint2, timepoint3
-    from med_diuretics
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_diuretics;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* DIABETES MEDICATIONS
-*****************************************************************************************;
-  data med_diabetes;
-    set bamed_matched;
+        substr(atccode25,1,7) in ('C09DX01','C09DX03') then diuretic = 1;
+        else diuretic = 0;
 
     if substr(atccode1,1,3) = 'A10' or
         substr(atccode1,1,3) = 'A10' or
@@ -1331,34 +1229,8 @@
         substr(atccode22,1,3) = 'A10' or
         substr(atccode23,1,3) = 'A10' or
         substr(atccode24,1,3) = 'A10' or
-        substr(atccode25,1,3) = 'A10';
-  run;
-
-  proc sql;
-    create table med_diabetes_count as
-    select elig_studyid, count(elig_studyid) as diabetes_n, timepoint1, timepoint2, timepoint3
-    from med_diabetes
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_diabetes;
-    by elig_studyid;
-  run;
-
-  /*
-  PROC EXPORT DATA= med_diabetes
-              OUTFILE= "\\rfa01\BWH-SleepEpi-heartbeat\SAS\Medications\_datasets\med_diabetes_&sasfiledate..csv"
-              DBMS=CSV REPLACE;
-       PUTNAMES=YES;
-  RUN;
-  */
-
-
-*****************************************************************************************;
-* LIPID LOWERING MEDICATIONS
-*****************************************************************************************;
-  data med_lipidlowering;
-    set bamed_matched;
+        substr(atccode25,1,3) = 'A10' then diabetesmed = 1;
+        else diabetesmed = 0;
 
     if (substr(atccode1,1,3) = 'C10' or
         substr(atccode2,1,3) = 'C10' or
@@ -1385,36 +1257,10 @@
         substr(atccode23,1,3) = 'C10' or
         substr(atccode24,1,3) = 'C10' or
         substr(atccode25,1,3) = 'C10') and
-        mednames ne 'Omega-3 Acid'; /* NO FISH OIL, per Dan/Susan 05/15/2012 */
-  run;
+        mednames ne 'Omega-3 Acid' then lipidlowering = 1;
+        else lipidlowering = 0;
 
-  proc sql;
-    create table med_lipidlowering_count as
-    select elig_studyid, count(elig_studyid) as lipidlowering_n, timepoint1, timepoint2, timepoint3
-    from med_lipidlowering
-    group by elig_studyid;
-quit;
-
-  proc sort data=med_lipidlowering;
-    by elig_studyid;
-  run;
-
-  /*
-  PROC EXPORT DATA= med_lipidlowering
-              OUTFILE= "\\rfa01\BWH-SleepEpi-heartbeat\SAS\Medications\_datasets\med_lipidlowering_&sasfiledate..csv"
-              DBMS=CSV REPLACE;
-       PUTNAMES=YES;
-  RUN;
-  */
-
-
-*****************************************************************************************;
-* ANTI-HYPERTENSIVE MEDICATIONS
-*****************************************************************************************;
-  data med_antihypertensive;
-    set bamed_matched;
-
-    if substr(atccode1,1,3) in ('C02','C03','C04','C07','C08','C09') or
+      if substr(atccode1,1,3) in ('C02','C03','C04','C07','C08','C09') or
         substr(atccode2,1,3) in ('C02','C03','C04','C07','C08','C09') or
         substr(atccode3,1,3) in ('C02','C03','C04','C07','C08','C09') or
         substr(atccode4,1,3) in ('C02','C03','C04','C07','C08','C09') or
@@ -1488,231 +1334,8 @@ quit;
         substr(atccode22,1,7) = 'C05AE02' or
         substr(atccode23,1,7) = 'C05AE02' or
         substr(atccode24,1,7) = 'C05AE02' or
-        substr(atccode25,1,7) = 'C05AE02';
-  run;
-
-  proc sql;
-    create table med_antihypertensive_count as
-    select elig_studyid, count(elig_studyid) as antihypertensive_n, timepoint1, timepoint2, timepoint3
-    from med_antihypertensive
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_antihypertensive;
-    by elig_studyid;
-  run;
-
-  /*
-  PROC EXPORT DATA= med_diabetes
-              OUTFILE= "\\rfa01\BWH-SleepEpi-heartbeat\SAS\Medications\_datasets\med_diabetes_&sasfiledate..csv"
-              DBMS=CSV REPLACE;
-       PUTNAMES=YES;
-  RUN;
-  */
-
-
-*****************************************************************************************;
-* STATINS
-*****************************************************************************************;
-  data med_statin;
-    set bamed_matched;
-
-    if (substr(atccode1,1,5) = 'C10AA' or
-        substr(atccode2,1,5) = 'C10AA' or
-        substr(atccode3,1,5) = 'C10AA' or
-        substr(atccode4,1,5) = 'C10AA' or
-        substr(atccode5,1,5) = 'C10AA' or
-        substr(atccode6,1,5) = 'C10AA' or
-        substr(atccode7,1,5) = 'C10AA' or
-        substr(atccode8,1,5) = 'C10AA' or
-        substr(atccode9,1,5) = 'C10AA' or
-        substr(atccode10,1,5) = 'C10AA' or
-        substr(atccode11,1,5) = 'C10AA' or
-        substr(atccode12,1,5) = 'C10AA' or
-        substr(atccode13,1,5) = 'C10AA' or
-        substr(atccode14,1,5) = 'C10AA' or
-        substr(atccode15,1,5) = 'C10AA' or
-        substr(atccode16,1,5) = 'C10AA' or
-        substr(atccode17,1,5) = 'C10AA' or
-        substr(atccode18,1,5) = 'C10AA' or
-        substr(atccode19,1,5) = 'C10AA' or
-        substr(atccode20,1,5) = 'C10AA' or
-        substr(atccode21,1,5) = 'C10AA' or
-        substr(atccode22,1,5) = 'C10AA' or
-        substr(atccode23,1,5) = 'C10AA' or
-        substr(atccode24,1,5) = 'C10AA' or
-        substr(atccode25,1,5) = 'C10AA' or
-        substr(atccode1,1,4) = 'C10B' or
-        substr(atccode2,1,4) = 'C10B' or
-        substr(atccode3,1,4) = 'C10B' or
-        substr(atccode4,1,4) = 'C10B' or
-        substr(atccode5,1,4) = 'C10B' or
-        substr(atccode6,1,4) = 'C10B' or
-        substr(atccode7,1,4) = 'C10B' or
-        substr(atccode8,1,4) = 'C10B' or
-        substr(atccode9,1,4) = 'C10B' or
-        substr(atccode10,1,4) = 'C10B' or
-        substr(atccode11,1,4) = 'C10B' or
-        substr(atccode12,1,4) = 'C10B' or
-        substr(atccode13,1,4) = 'C10B' or
-        substr(atccode14,1,4) = 'C10B' or
-        substr(atccode15,1,4) = 'C10B' or
-        substr(atccode16,1,4) = 'C10B' or
-        substr(atccode17,1,4) = 'C10B' or
-        substr(atccode18,1,4) = 'C10B' or
-        substr(atccode19,1,4) = 'C10B' or
-        substr(atccode20,1,4) = 'C10B' or
-        substr(atccode21,1,4) = 'C10B' or
-        substr(atccode22,1,4) = 'C10B' or
-        substr(atccode23,1,4) = 'C10B' or
-        substr(atccode24,1,4) = 'C10B' or
-        substr(atccode25,1,4) = 'C10B');
-  run;
-
-  proc sql;
-    create table med_statin_count as
-    select elig_studyid, count(elig_studyid) as statin_n, timepoint1, timepoint2, timepoint3
-    from med_statin
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_statin;
-    by elig_studyid;
-  run;
-
-
-  /*
-  PROC EXPORT DATA= med_statin
-              OUTFILE= "\\rfa01\BWH-SleepEpi-heartbeat\SAS\Medications\_datasets\med_statin_&sasfiledate..csv"
-              DBMS=CSV REPLACE;
-       PUTNAMES=YES;
-  RUN;
-  */
-
-
-*****************************************************************************************;
-* NITRATES -- added for Walia/Mehra 11/20/2012
-*****************************************************************************************;
-  data med_nitrate;
-    set bamed_matched;
-
-    if (substr(atccode1,1,5) = 'C01DA' or
-        substr(atccode2,1,5) = 'C01DA' or
-        substr(atccode3,1,5) = 'C01DA' or
-        substr(atccode4,1,5) = 'C01DA' or
-        substr(atccode5,1,5) = 'C01DA' or
-        substr(atccode6,1,5) = 'C01DA' or
-        substr(atccode7,1,5) = 'C01DA' or
-        substr(atccode8,1,5) = 'C01DA' or
-        substr(atccode9,1,5) = 'C01DA' or
-        substr(atccode10,1,5) = 'C01DA' or
-        substr(atccode11,1,5) = 'C01DA' or
-        substr(atccode12,1,5) = 'C01DA' or
-        substr(atccode13,1,5) = 'C01DA' or
-        substr(atccode14,1,5) = 'C01DA' or
-        substr(atccode15,1,5) = 'C01DA' or
-        substr(atccode16,1,5) = 'C01DA' or
-        substr(atccode17,1,5) = 'C01DA' or
-        substr(atccode18,1,5) = 'C01DA' or
-        substr(atccode19,1,5) = 'C01DA' or
-        substr(atccode20,1,5) = 'C01DA' or
-        substr(atccode21,1,5) = 'C01DA' or
-        substr(atccode22,1,5) = 'C01DA' or
-        substr(atccode23,1,5) = 'C01DA' or
-        substr(atccode24,1,5) = 'C01DA' or
-        substr(atccode25,1,5) = 'C01DA' or
-        substr(atccode1,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode2,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode3,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode4,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode5,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode6,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode7,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode8,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode9,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode10,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode11,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode12,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode13,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode14,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode15,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode16,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode17,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode18,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode19,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode20,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode21,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode22,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode23,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode24,1,7) in ('A02BX12','C05AE02') or
-        substr(atccode25,1,7) in ('A02BX12','C05AE02'));
-  run;
-
-  proc sql;
-    create table med_nitrate_count as
-    select elig_studyid, count(elig_studyid) as nitrate_n, timepoint1, timepoint2, timepoint3
-    from med_nitrate
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_nitrate;
-    by elig_studyid;
-  run;
-
-
-*****************************************************************************************;
-* PERIPHERAL VASODILATORS -- added for Walia/Mehra 12/06/2012
-*****************************************************************************************;
-  data med_perdilator;
-    set bamed_matched;
-
-    if  substr(atccode1,1,3) = 'C04' or
-        substr(atccode2,1,3) = 'C04' or
-        substr(atccode3,1,3) = 'C04' or
-        substr(atccode4,1,3) = 'C04' or
-        substr(atccode5,1,3) = 'C04' or
-        substr(atccode6,1,3) = 'C04' or
-        substr(atccode7,1,3) = 'C04' or
-        substr(atccode8,1,3) = 'C04' or
-        substr(atccode9,1,3) = 'C04' or
-        substr(atccode10,1,3) = 'C04' or
-        substr(atccode11,1,3) = 'C04' or
-        substr(atccode12,1,3) = 'C04' or
-        substr(atccode13,1,3) = 'C04' or
-        substr(atccode14,1,3) = 'C04' or
-        substr(atccode15,1,3) = 'C04' or
-        substr(atccode16,1,3) = 'C04' or
-        substr(atccode17,1,3) = 'C04' or
-        substr(atccode18,1,3) = 'C04' or
-        substr(atccode19,1,3) = 'C04' or
-        substr(atccode20,1,3) = 'C04' or
-        substr(atccode21,1,3) = 'C04' or
-        substr(atccode22,1,3) = 'C04' or
-        substr(atccode23,1,3) = 'C04' or
-        substr(atccode24,1,3) = 'C04' or
-        substr(atccode25,1,3) = 'C04';
-  run;
-
-  proc sql;
-    create table med_perdilator_count as
-    select elig_studyid, count(elig_studyid) as perdilator_n, timepoint1, timepoint2, timepoint3
-    from med_perdilator
-    group by elig_studyid;
-  quit;
-
-  proc sort data=med_perdilator;
-    by elig_studyid;
-  run;
-
-
-
-*****************************************************************************************;
-* OTHER ANTIHYPERTENSIVES -- added for Walia/Mehra 12/06/2012
-*****************************************************************************************;
-  data med_otherah;
-    set bamed_matched;
-
-    if (substr(atccode1,1,4) = 'C02A' or
+        substr(atccode25,1,7) = 'C05AE02' or
+        substr(atccode1,1,4) = 'C02A' or
         substr(atccode2,1,4) = 'C02A' or
         substr(atccode3,1,4) = 'C02A' or
         substr(atccode4,1,4) = 'C02A' or
@@ -1861,23 +1484,357 @@ quit;
         substr(atccode22,1,4) = 'C02L' or
         substr(atccode23,1,4) = 'C02L' or
         substr(atccode24,1,4) = 'C02L' or
-        substr(atccode25,1,4) = 'C02L')
-;
-  run;
+        substr(atccode25,1,4) = 'C02L' then antihypertensive = 1;
+        else antihypertensive = 0;
 
+  if (substr(atccode1,1,5) = 'C10AA' or
+        substr(atccode2,1,5) = 'C10AA' or
+        substr(atccode3,1,5) = 'C10AA' or
+        substr(atccode4,1,5) = 'C10AA' or
+        substr(atccode5,1,5) = 'C10AA' or
+        substr(atccode6,1,5) = 'C10AA' or
+        substr(atccode7,1,5) = 'C10AA' or
+        substr(atccode8,1,5) = 'C10AA' or
+        substr(atccode9,1,5) = 'C10AA' or
+        substr(atccode10,1,5) = 'C10AA' or
+        substr(atccode11,1,5) = 'C10AA' or
+        substr(atccode12,1,5) = 'C10AA' or
+        substr(atccode13,1,5) = 'C10AA' or
+        substr(atccode14,1,5) = 'C10AA' or
+        substr(atccode15,1,5) = 'C10AA' or
+        substr(atccode16,1,5) = 'C10AA' or
+        substr(atccode17,1,5) = 'C10AA' or
+        substr(atccode18,1,5) = 'C10AA' or
+        substr(atccode19,1,5) = 'C10AA' or
+        substr(atccode20,1,5) = 'C10AA' or
+        substr(atccode21,1,5) = 'C10AA' or
+        substr(atccode22,1,5) = 'C10AA' or
+        substr(atccode23,1,5) = 'C10AA' or
+        substr(atccode24,1,5) = 'C10AA' or
+        substr(atccode25,1,5) = 'C10AA' or
+        substr(atccode1,1,4) = 'C10B' or
+        substr(atccode2,1,4) = 'C10B' or
+        substr(atccode3,1,4) = 'C10B' or
+        substr(atccode4,1,4) = 'C10B' or
+        substr(atccode5,1,4) = 'C10B' or
+        substr(atccode6,1,4) = 'C10B' or
+        substr(atccode7,1,4) = 'C10B' or
+        substr(atccode8,1,4) = 'C10B' or
+        substr(atccode9,1,4) = 'C10B' or
+        substr(atccode10,1,4) = 'C10B' or
+        substr(atccode11,1,4) = 'C10B' or
+        substr(atccode12,1,4) = 'C10B' or
+        substr(atccode13,1,4) = 'C10B' or
+        substr(atccode14,1,4) = 'C10B' or
+        substr(atccode15,1,4) = 'C10B' or
+        substr(atccode16,1,4) = 'C10B' or
+        substr(atccode17,1,4) = 'C10B' or
+        substr(atccode18,1,4) = 'C10B' or
+        substr(atccode19,1,4) = 'C10B' or
+        substr(atccode20,1,4) = 'C10B' or
+        substr(atccode21,1,4) = 'C10B' or
+        substr(atccode22,1,4) = 'C10B' or
+        substr(atccode23,1,4) = 'C10B' or
+        substr(atccode24,1,4) = 'C10B' or
+        substr(atccode25,1,4) = 'C10B') then statin = 1;
+        else statin = 0;
+
+    if (substr(atccode1,1,5) = 'C01DA' or
+        substr(atccode2,1,5) = 'C01DA' or
+        substr(atccode3,1,5) = 'C01DA' or
+        substr(atccode4,1,5) = 'C01DA' or
+        substr(atccode5,1,5) = 'C01DA' or
+        substr(atccode6,1,5) = 'C01DA' or
+        substr(atccode7,1,5) = 'C01DA' or
+        substr(atccode8,1,5) = 'C01DA' or
+        substr(atccode9,1,5) = 'C01DA' or
+        substr(atccode10,1,5) = 'C01DA' or
+        substr(atccode11,1,5) = 'C01DA' or
+        substr(atccode12,1,5) = 'C01DA' or
+        substr(atccode13,1,5) = 'C01DA' or
+        substr(atccode14,1,5) = 'C01DA' or
+        substr(atccode15,1,5) = 'C01DA' or
+        substr(atccode16,1,5) = 'C01DA' or
+        substr(atccode17,1,5) = 'C01DA' or
+        substr(atccode18,1,5) = 'C01DA' or
+        substr(atccode19,1,5) = 'C01DA' or
+        substr(atccode20,1,5) = 'C01DA' or
+        substr(atccode21,1,5) = 'C01DA' or
+        substr(atccode22,1,5) = 'C01DA' or
+        substr(atccode23,1,5) = 'C01DA' or
+        substr(atccode24,1,5) = 'C01DA' or
+        substr(atccode25,1,5) = 'C01DA' or
+        substr(atccode1,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode2,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode3,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode4,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode5,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode6,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode7,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode8,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode9,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode10,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode11,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode12,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode13,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode14,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode15,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode16,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode17,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode18,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode19,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode20,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode21,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode22,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode23,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode24,1,7) in ('A02BX12','C05AE02') or
+        substr(atccode25,1,7) in ('A02BX12','C05AE02')) then nitrate = 1;
+        else nitrate = 0;
+
+    if  substr(atccode1,1,3) = 'C04' or
+        substr(atccode2,1,3) = 'C04' or
+        substr(atccode3,1,3) = 'C04' or
+        substr(atccode4,1,3) = 'C04' or
+        substr(atccode5,1,3) = 'C04' or
+        substr(atccode6,1,3) = 'C04' or
+        substr(atccode7,1,3) = 'C04' or
+        substr(atccode8,1,3) = 'C04' or
+        substr(atccode9,1,3) = 'C04' or
+        substr(atccode10,1,3) = 'C04' or
+        substr(atccode11,1,3) = 'C04' or
+        substr(atccode12,1,3) = 'C04' or
+        substr(atccode13,1,3) = 'C04' or
+        substr(atccode14,1,3) = 'C04' or
+        substr(atccode15,1,3) = 'C04' or
+        substr(atccode16,1,3) = 'C04' or
+        substr(atccode17,1,3) = 'C04' or
+        substr(atccode18,1,3) = 'C04' or
+        substr(atccode19,1,3) = 'C04' or
+        substr(atccode20,1,3) = 'C04' or
+        substr(atccode21,1,3) = 'C04' or
+        substr(atccode22,1,3) = 'C04' or
+        substr(atccode23,1,3) = 'C04' or
+        substr(atccode24,1,3) = 'C04' or
+        substr(atccode25,1,3) = 'C04' then peripheral_dilator = 1;
+        else peripheral_dilator = 0;
+
+    run;
+
+*****************************************************************************************;
+* ACE INHIBITOR OR ARB
+*****************************************************************************************;
+
+  proc sql;
+    create table med_aceinhibitor_count as
+    select elig_studyid, count(elig_studyid) as aceinhibitor_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having aceinhibitor = 1;
+  quit;
+
+*****************************************************************************************;
+* ALPHA BLOCKER
+*****************************************************************************************;
+
+  proc sql;
+    create table med_alphablocker_count as
+    select elig_studyid, count(elig_studyid) as alphablocker_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having alphablocker = 1;
+  quit;
+
+*****************************************************************************************;
+* ALDOSTERONE BLOCKER -- added 11/20/2012 for Walia/Mehra
+*****************************************************************************************;
+
+  proc sql;
+    create table med_aldosteroneblocker_count as
+    select elig_studyid, count(elig_studyid) as aldosteroneblocker_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having aldosteroneblocker = 1;
+  quit;
+
+*****************************************************************************************;
+* ANTIDEPRESSANT -- added 01/28/2014
+*****************************************************************************************;
+
+  proc sql;
+    create table med_antidepressant_count as
+    select elig_studyid, count(elig_studyid) as antidepressant_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having antidepressant = 1;
+  quit;
+
+*****************************************************************************************;
+* BETA BLOCKER
+*****************************************************************************************;
+
+  proc sql;
+    create table med_betablocker_count as
+    select elig_studyid, count(elig_studyid) as betablocker_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having betablocker = 1;
+  quit;
+
+*****************************************************************************************;
+* CALCIUM CHANNEL BLOCKER
+*****************************************************************************************;
+
+  proc sql;
+    create table med_calciumblocker_count as
+    select elig_studyid, count(elig_studyid) as calciumblocker_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having calciumblocker = 1;
+  quit;
+
+*****************************************************************************************;
+* DIURETICS
+*****************************************************************************************;
+
+  proc sql;
+    create table med_diuretics_count as
+    select elig_studyid, count(elig_studyid) as diuretics_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having diuretic = 1;
+  quit;
+
+*****************************************************************************************;
+* DIABETES
+*****************************************************************************************;
+  proc sql;
+    create table med_diabetes_count as
+    select elig_studyid, count(elig_studyid) as diabetes_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having diabetesmed = 1;
+  quit;
+
+*****************************************************************************************;
+* LIPID-LOWERING MEDS
+*****************************************************************************************;
+  proc sql;
+    create table med_lipidlowering_count as
+    select elig_studyid, count(elig_studyid) as lipidlowering_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having lipidlowering = 1;
+  quit;
+
+*****************************************************************************************;
+* ANTI-HYPERTENSIVE
+*****************************************************************************************;
+  proc sql;
+    create table med_antihypertensive_count as
+    select elig_studyid, count(elig_studyid) as antihypertensive_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having antihypertensive = 1;
+  quit;
+
+*****************************************************************************************;
+* STATINS
+*****************************************************************************************;
+
+  proc sql;
+    create table med_statin_count as
+    select elig_studyid, count(elig_studyid) as statin_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having statin = 1;
+  quit;
+
+
+*****************************************************************************************;
+* NITRATES -- added for Walia/Mehra 11/20/2012
+*****************************************************************************************;
+
+  proc sql;
+    create table med_nitrate_count as
+    select elig_studyid, count(elig_studyid) as nitrate_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having nitrate = 1;
+  quit;
+
+*****************************************************************************************;
+* PERIPHERAL VASODILATORS -- added for Walia/Mehra 12/06/2012
+*****************************************************************************************;
+
+  proc sql;
+    create table med_perdilator_count as
+    select elig_studyid, count(elig_studyid) as perdilator_n, timepoint1, timepoint2, timepoint3
+    from Fixed_medtimes
+    group by elig_studyid
+    having peripheral_dilator = 1;
+  quit;
+
+*****************************************************************************************;
+* OTHER ANTIHYPERTENSIVES -- added for Walia/Mehra 12/06/2012
+*****************************************************************************************;
+/*
   proc sql;
     create table med_otherah_count as
     select elig_studyid, count(elig_studyid) as otherah_n, timepoint1, timepoint2, timepoint3
-    from med_otherah
-    group by elig_studyid;
+    from Fixed_medtimes
+    group by elig_studyid
+    where  = 1;
   quit;
+*/
+*compare to old dataset;
+/*
+  proc compare base=bestair.bamedication_match
+      comp=Fixed_medtimes
+      method = absolute
+      criterion = 0.00500001
+      transpose
+      maxprint = 32767;
 
-  proc sort data=med_otherah;
-    by elig_studyid;
+      id elig_studyid medname med_startdate med_strength med_freq;
+  run;
+
+  proc sort data = bestair.bamedication_match out = bamedication_match2;
+  by elig_studyid medname med_startdate med_strength med_freq;
+  run;
+
+  proc sort data = Fixed_medtimes out = Fixed_medtimes2;
+  by elig_studyid medname med_startdate med_strength med_freq;
+  run;
+
+  proc compare base=bamedication_match2
+      comp=Fixed_medtimes2
+      method = absolute
+      criterion = 0.00500001
+      transpose
+      maxprint = 32767;
+
+      id DESCENDING elig_studyid medname med_startdate med_strength med_freq;
+  run;
+
+data checkthisout;
+  merge bamedication_match2 (in = a) Fixed_medtimes2 (in = b keep = elig_studyid medname med_strength med_startdate);
+  by elig_studyid medname med_strength med_startdate;
+  if a and not b;
+run;
+  */
+*****************************************************************************************;
+* SAVE PERMANENT DATASETS FOR MATCHED MEDICATIONS
+*****************************************************************************************;
+
+  *restrict to desired variables;
+  data bamed_matched_final;
+    set fixed_medtimes;
+
+    drop timeerror--peripheral_dilator;
   run;
 
   data bestair.bamedication_match bestair2.bamedication_match_&sasfiledate;
-    set bamed_matched;
+    set bamed_matched_final;
   run;
 
 ************************************;

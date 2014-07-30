@@ -434,6 +434,12 @@
 
   run;
 
+  data bestair_in (drop = pptid);
+    format studyid best12.;
+    set bestair_in;
+    studyid = input(pptid,5.);
+  run;
+
   proc sort data=bestair_in;
-    by pptid stdydt;
+    by studyid stdydt;
   run;

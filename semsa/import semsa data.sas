@@ -28,7 +28,7 @@
   data semsa_in;
     set redcap;
 
-    if 60000 le elig_studyid le 99999 and semsa_studyid > .;
+    if 60000 le elig_studyid le 99999 and semsa_studyid > 0;
 
     keep elig_studyid redcap_event_name semsa_studyid--semsa_complete;
   run;
@@ -95,15 +95,15 @@
 ***************************************************************************************;
 
   *print observations with partial and missing data;
-  proc sql;
-    title "SEMSA00 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 0;
-    title "SEMSA00 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 0;
-    TITLE "SEMSA06 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 6;
-    TITLE "SEMSA06 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 6;
-    TITLE "SEMSA12 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 12;
-    TITLE "SEMSA12 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 12;
-    TITLE "SEMSA MISS";select semsa_studyid, semsa_studyvisit from bestair.basemsa where semsa_studyid = . or semsa_studyid < 0;
-  quit;
+/*  proc sql;*/
+/*    title "SEMSA00 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 0;*/
+/*    title "SEMSA00 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 0;*/
+/*    TITLE "SEMSA06 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 6;*/
+/*    TITLE "SEMSA06 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 6;*/
+/*    TITLE "SEMSA12 NO MISS";select semsa_studyid from bestair.basemsa where semsa_pr_nmiss = 0 and semsa_oe_nmiss = 0 and semsa_tse_nmiss = 0 and semsa_studyvisit = 12;*/
+/*    TITLE "SEMSA12 PART";select semsa_studyid from bestair.basemsa where (semsa_pr_nmiss ne 0 or semsa_oe_nmiss ne 0 or semsa_tse_nmiss ne 0) and semsa_studyvisit = 12;*/
+/*    TITLE "SEMSA MISS";select semsa_studyid, semsa_studyvisit from bestair.basemsa where semsa_studyid = . or semsa_studyid < 0;*/
+/*  quit;*/
 
 
 ***************************************************************************************;

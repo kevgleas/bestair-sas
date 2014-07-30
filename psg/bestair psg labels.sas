@@ -1,5 +1,5 @@
 proc datasets library=work nolist;
-modify mros2psg;
+modify &bestairpsg_datasetname;
 label
 pptid = 'Participant ID'
 acrostic = 'Acrostic'
@@ -161,7 +161,7 @@ BPMMIN = 'Lowest Heart rate (bpm)'
 BPMMAX = 'Highest Heart rate (bpm)'
 APNEA3 = '# of Apnea events with >= 3% desat'
 AHI3 = 'Apnea / Hypopnea events with >= 3% percent desat per hour of sleep'
-AHIU3 = 'RDI – Apnea/Hypopnea/AASM Hypopneas with >= 3% desat'
+AHIU3 = 'RDI â€“ Apnea/Hypopnea/AASM Hypopneas with >= 3% desat'
 HREMBP = '# of Hypopnea (REM, Back, all desats)'
 RDIRBP = 'Hypopnea per hour (REM, Back, all desats)'
 AVHRBP = 'Avg. Hypopnea length (REM, Back, all desats) (seconds)'

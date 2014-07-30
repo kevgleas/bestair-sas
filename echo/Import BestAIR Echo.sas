@@ -28,6 +28,102 @@
 		by elig_studyid;
 	run;
 
+	* import spreadsheet with variable formats for echo variables;
+  proc import out=formats datafile = "\\rfa01\BWH-SleepEpi-bestair\Data\SAS\bestair data dictionary.xls" dbms = xls replace;
+    mixed=yes;
+    getnames = yes;
+    sheet = "dd";
+    datarow = 2;
+  run;
+
+	data echo_formats;
+		set formats;
+		where table = "BESTAIRECHO";
+	run;
+
+*****************************************************************************************;
+* APPLY LABELS -- code was taken from bestair options and libnames
+*****************************************************************************************;
+  %macro ddlabel(ds,dir,prefix=none);
+    %let file = \\rfa01\BWH-SleepEpi-bestair\Data\SAS\&dir\&ds._labels.sas;
+    %let dd = echo_formats;
+
+      ************************************************************************************;
+   		* begin writing labeling program;
+      ************************************************************************************;
+    data _null_;
+      file "&file";
+      put "proc datasets library=work nolist;";
+      put "modify &ds.;";
+      put "label";
+    run;
+
+    * labels;
+    data _null_;
+      file "&file" MOD;
+      set &dd; *(where=(lowcase(table) = lowcase("&ds")));
+      length myput $3200.;
+      if label = "" then label = name;
+      %if &prefix = none %then %do;
+        myput = trim(left(name)) || " = '" || trim(left(label)) || "'";
+      %end;
+      %else %do;
+        myput = trim(left(name)) || " = '" || &prefix || trim(left(label)) || "'";
+      %end;
+      put myput;
+
+      call symput('nvars',trim(left(put(_n_,best32.))));
+    run;
+    data _null_;
+      file "&file" MOD;
+      put ";";
+      put "  ";
+      put "format";
+    run;
+
+    * formats;
+    data _null_;
+      file "&file" MOD;
+      set &dd; *(where=(lowcase(table) = lowcase("&ds")));
+      length myput formatlx formatx $3200.;
+      formatlx = trim(left(translate(put(formatl,4.)," ","."))) || ".";
+      formatx = trim(left(format)) || trim(left(formatlx)) || trim(left(translate(put(formatd,4.)," ",".")));
+      if formatx not in ("", ".", " .") then do;
+        myput = trim(left(name)) || " " || trim(left(formatx));
+        put myput;
+      end;
+    run;
+
+    data _null_;
+      file "&file" MOD;
+      put ";";
+      put "run;";
+      put "quit;";
+    run;
+    ************************************************************************************;
+    * end writing labeling program
+    ************************************************************************************;
+
+    * drop data dictionary dataset;
+    proc datasets library=work nolist;
+      delete &dd;
+    quit;
+
+    * run labeling program;
+    options nosource2;
+    %include "&file";
+    options source2;
+
+    options nosource nonotes;
+    %put *************************************************************;
+    %put * ddlabel macro completed for table &ds..;
+    %put * There were &nvars variables in the data dictionary.;
+    %put *************************************************************;
+    options source notes;
+  %mend;
+
+	%ddlabel(echo,echo,prefix=none);
+
 	*merge rfa data with data stored on redcap;
 	data echo_rand;
 		merge echo (in=a) bestair.badsmbtable4 (keep=elig_studyid elig_gender rand_treatmentarm rand_siteid);
@@ -104,7 +200,7 @@
 *****************************************************************************************;
 * APPLY LABELS
 *****************************************************************************************;
-	%ddlabel(bestairecho,echo);
+/*	%ddlabel(bestairecho,echo);*/
 
 /*Labels as yet undefined*/
 
@@ -126,3 +222,14 @@
 		set bestairecho;
 	run;
 
+*****************************************************************************************;
+* CREATE HISTOGRAMS OF RELEVANT VARIABLES
+*****************************************************************************************;
+	ods pdf file = "\\rfa01\bwh-sleepepi-bestair\Data\SAS\echo\Histograms of Echo Variables &sasfiledate..PDF";
+	ods select histogram;
+	proc univariate data=echo_rand;
+		title "Frequency Distributions for Echo Variables";
+		var LVEDD--RVOTVTI;
+		histogram;
+	run;title;
+	ods pdf close;

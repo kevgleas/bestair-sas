@@ -10,7 +10,7 @@
 
 *import data from two different arms simultaneously to conserve computation time;
   data bestair_elig_info(drop = rand_date anth_namecode) rand_set(keep = elig_studyid rand_date anth_namecode) ;
-    set bestair.baredcap;
+    set bestair.baredcap_nomiss;
 
     if 60000 le elig_studyid le 99999 and redcap_event_name = "screening_arm_0"
       then output bestair_elig_info;
@@ -18,7 +18,7 @@
     if 60000 le elig_studyid le 99999 and rand_date > .
       then output rand_set;
 
-    keep elig_studyid--eligibility_complete rand_date anth_namecode;
+    keep elig_studyid--eligibility_complete journal_dayscompleted journal_daysmaskused rand_date anth_namecode;
   run;
 
 *merge randomization information into eligibility dataset;
@@ -27,6 +27,93 @@
 
     by elig_studyid;
 
+  run;
+
+  data bestaireligibility_fix;
+    set bestaireligibility;
+
+    array numeric_vars[*] _numeric_;
+    array char_vars[*] _character_;
+
+    do i = 1 to dim(numeric_vars);
+      if (numeric_vars[i] < -2 and vname(numeric_vars[i]) ne "elig_incl01dob") then numeric_vars[i] = .;
+    end;
+
+    do j = 1 to dim(char_vars);
+      if char_vars[j] in ("-8","-9", "-10") then char_vars[j] = "";
+    end;
+
+    drop  embqs_study_id--embletta_qs_complete eligibility_complete i j;
+  run;
+
+  proc format;
+    value randomized_educationf
+    1 = "1: Did not complete high school or equivalent"
+    2 = "2: High school graduate"
+    3 = "3: At least Bachelors"
+    ;
+    value race_whitenonhispanicf
+    0 = "0: Not [White, Not Hispanic or Latino]"
+    1 = "1: White, Not Hispanic or Latino"
+    ;
+    value CVDstatus_primaryf
+    0 = "0: CVD Risk Factors Only"
+    1 = "1: Established CVD"
+    ;
+  run;
+
+  data bestaireligibility_final;
+    retain elig_studyid randomized;
+    set bestaireligibility_fix;
+
+    if rand_date > . then randomized = 1;
+    else randomized = 0;
+
+    format randomized_education randomized_educationf.;
+
+    if randomized = 1 then do;
+      if elig_education < 0 or elig_education > 2 then randomized_education = 3;
+      else randomized_education = elig_education;
+
+      age_atbaseline = year(rand_date) - year(elig_incl01dob) - 1;
+      if month(rand_date) > month(elig_incl01dob) then age_atbaseline = age_atbaseline + 1;
+      else if month(rand_date) = month(elig_incl01dob) then do;
+        if day(rand_date) ge day(elig_incl01dob) then age_atbaseline = age_atbaseline + 1;
+      end;
+    end;
+
+    format race_whitenothispanic race_whitenonhispanicf.;
+
+    array check4whitenh[*] elig_raceamerind--elig_raceblack elig_raceother elig_ethnicity;
+
+    do i = 1 to dim(check4whitenh);
+      if check4whitenh[i] = 1 then race_whitenothispanic = 0;
+    end;
+
+    if race_whitenothispanic = . then do;
+      if elig_racewhite = 1 then race_whitenothispanic = 1;
+    end;
+
+    format CVDstatus_primary CVDstatus_primaryf.;
+
+    array establishedCVD_criteria[*] elig_incl04ami--elig_incl04ddiabetes elig_incl04ediabetes;
+
+    if elig_incl04cvd = 1 then do;
+      do j = 1 to dim(establishedCVD_criteria);
+        if establishedCVD_criteria[j] = 1 then CVDstatus_primary = 1;
+      end;
+      if CVDstatus_primary = . then CVDstatus_primary = 0;
+    end; 
+
+    format runin_daysmask_ge13 yesnof.;
+    if journal_daysmaskused ge 13 then runin_daysmask_ge13 = 1;
+    else if journal_daysmaskused ne . then runin_daysmask_ge13 = 0;
+
+    drop journal_dayscompleted journal_daysmaskused rand_date anth_namecode i j;
+  run;
+
+  data bestair.bestaireligibility;
+    set bestaireligibility_final;
   run;
 
 

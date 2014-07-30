@@ -345,5 +345,5 @@
 
   *update permanent dataset;
   data bestair.bestairsf36 bestair2.bestairsf36;
-    set sf36_fix;
+    set sf36_fix2;
   run;

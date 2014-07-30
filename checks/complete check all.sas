@@ -82,33 +82,38 @@
 %include "\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\complete check questionnaires.sas";
 %include "\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\complete check crfs.sas";
 
-
+data bp_compstatsfinal;
+  set bp_compstatsfinal;
+  if visit_type = '6 Month' then do;
+    
+  end;
+run;
 
   proc sql;
-  ods pdf file="\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\BestAIR Completeness &sasfiledate..PDF";
+  ods pdf file="\\rfa01\bwh-sleepepi-bestair\Data\SAS\checks\BestAIR Predicted Completeness &sasfiledate..PDF";
 
   title "BestAIR 24-Hour Ambulatory Blood Pressure Completeness Percentages";
-  title2 "Percentage of All Randomized Participants to Reach Timepoint";
+  title2 "Percentage of All Randomized Participants Expected to Reach Timepoint (Excluding Pending)";
   select visit_type as Visit, pctpart_bpresolved label = "Including Partial", pctcomp_bpresolved label = "Excluding Partial"
   from work.bp_compstatsfinal;
   title;
 
   title "BestAIR Lab Results Completeness Percentages";
-  title2 "Percentage of All Randomized Participants to Reach Timepoint";
+  title2 "Percentage of All Randomized Participants Expected to Reach Timepoint (Excluding Pending)";
   select visit_type as Visit, pctcomp_bloodresolved as Blood, pctcomp_urineresolved as Urine
   from work.blood_compstatsfinal;
   title;
 
 
   title "BestAIR Ultrasound Completeness Percentages";
-  title2 "Percentage of All Randomized Participants to Reach Timepoint";
+  title2 "Percentage of All Randomized Participants Expected to Reach Timepoint (Excluding Pending)";
   select visit_type as Visit, pctcomp_pwaresolved label = "Pulse Wave Analysis", pctcomp_pwvresolved label = "Pulse Wave Velocity", pctcomp_echoresolved as Echo
   from work.ultrasound_compstatsfinal;
   title;
 
 
   title "BestAIR Questionnaire Completeness as Percentage of Completed Variables";
-  title2 "Percentage of All Randomized Participants to Reach Timepoint";
+  title2 "Percentage of All Randomized Participants Expected to Reach Timepoint (Excluding Pending)";
   select visit_type as Visit, cal_comp as Calgary, phq_comp as PHQ_8, prom_comp as PROMIS, sarp_comp as SARP, semsa_comp as SEMSA, sf36_comp label = "SF-36", twpas_comp as TWPAS,
       allquestionnaire_comp as All_Questionnaires
   from work.quest_compstatsfinal;

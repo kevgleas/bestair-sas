@@ -21,10 +21,13 @@
 ****************************************************************************************;
 *  PRINT PARTICIPANTS MISSING DEMOGRAPHIC INFORMATION
 ****************************************************************************************;
-
   proc sql;
+    title "Unverified Eligibility Information, Randomized Subjects";
+    select elig_studyid from elig_info where eligibility_complete < 2;
+  quit;
+  
   ods pdf file="\\rfa01\bwh-sleepepi-bestair\data\sas\checks\Missing Eligibility Info &sasfiledate..PDF";
-
+  proc sql;
   *create table of randomized participants missing demographic info;
 
     title "Randomized, Missing Eligibility Form";
@@ -123,5 +126,6 @@
 
   */
 
-  ods pdf close;
+  
   quit;
+  ods pdf close;

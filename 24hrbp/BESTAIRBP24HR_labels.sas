@@ -137,7 +137,7 @@ monitor_24_hr_qc_complete = 'Complete?'
 inabp = 'inabp'
 inredcap = 'inredcap'
 ;
-  
+
 format
 bp24date MMDDYY8.
 starttime TIME6.

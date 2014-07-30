@@ -371,9 +371,36 @@
     drop COL2;
   run;
 
+  proc transpose data=medications2 out=wide9;
+      by elig_Studyid;
+    var med_timetakena_01-med_timetakena_60;
+  run;
+
+  data wide9;
+    set wide9(rename=COL1=med_timetakena);
+  run;
+
+  proc transpose data=medications2 out=wide10;
+      by elig_Studyid;
+    var med_timetakenb_01-med_timetakenb_60;
+  run;
+
+  data wide10;
+    set wide10(rename=COL1=med_timetakenb);
+  run;
+
+  proc transpose data=medications2 out=wide11;
+      by elig_Studyid;
+    var med_timetakenc_01-med_timetakenc_60;
+  run;
+
+  data wide11;
+    set wide11(rename=COL1=med_timetakenc);
+  run;
+
   *merge above datasets to put each variable for given medication as same observation;
   data medmerge;
-    merge wide1 wide2 wide3 wide4 wide5 wide6 wide7 wide8;
+    merge wide1 wide2 wide3 wide4 wide5 wide6 wide7 wide8 wide9 wide10 wide11;
     by elig_studyid;
     drop _NAME_ _LABEL_;
   run;

@@ -29,7 +29,7 @@ RVOTVTI = 'RVOT VTI'
 PFO = 'Interatrial shunt: 1: Yes, 2: No, 99'
 IASEP = 'Interatrial septum: 0: normal, 1: Hypermobile, 2: Aneurysmal,'
 ;
-  
+
 format
 ECHO_ID $9.
 SITE_ID BEST12.

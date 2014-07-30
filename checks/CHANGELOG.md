@@ -54,6 +54,8 @@
 ## July 29, 2014
 
 ### Changes
+  - bestair check for missing demographic info.sas
+    - Add 1 additional check.
   - complete check all.sas
     - Update to reflect more up-to-date data.
   - complete check crfs.sas

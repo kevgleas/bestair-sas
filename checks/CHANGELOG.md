@@ -50,3 +50,13 @@
     - Move header to README.md.
   - entry error check.sas
     - Move header to README.md.
+
+## July 29, 2014
+
+### Changes
+  - complete check all.sas
+    - Update to reflect more up-to-date data.
+  - complete check crfs.sas
+    - Update to reflect more up-to-date data.
+  - complete check questionnaires.sas
+    - Update to reflect more up-to-date data.

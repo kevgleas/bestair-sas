@@ -443,3 +443,131 @@
   proc sort data=bestair_in;
     by studyid stdydt;
   run;
+  
+  *********************** IMPORT REDCAP Data *******************************;
+  **************************************************************************;
+  %include "&bestairpath\SAS\redcap\_components\bestair create rand set.sas";
+  proc sql noprint;
+    select elig_studyid into :randomized_list separated by ', '
+    from randset;
+  quit;
+
+  data redcap_embletta;
+    set redcap_all (keep = elig_studyid embqs_study_id--embletta_qs_complete);
+
+    if embqs_study_id ne "";
+
+    embqs_ahi = input(embqs_first_pass_ahi, 8.);
+
+    array numeric_array[*] _numeric_;
+    do i = 1 to dim(numeric_array);
+      if numeric_array[i] in (-8,-9,-10) then numeric_array[i] = .;
+    end;
+    drop i;
+
+    if embqs_unit_id in ("-8","-9","-10") then embqs_unit_id = "";
+    if embqs_staff_id in ("-8","-9","-10") then embqs_staff_id = "";
+
+  run;
+
+  proc format;
+    value psgpurposef
+      0 = "0: Screening PSG"
+      1 = "1: Final Visit PSG"
+    ;
+    value yesnof
+      0 = "0: No"
+      1 = "1: Yes"
+    ;
+    value ahisourcef
+      1 = "1: Scored by BestAIR Staff"
+      3 = "3: AHI3p recorded on Eligibility Form"
+      4 = "4: (AHI4p reported on Eligibility Form)*1.25"
+      9 = "9: 'First Pass' AHI3p recorded on Embletta QS"
+    ;
+  run;
+
+  data redcap_embletta_withrand;
+    merge randset redcap_embletta (in = b);
+    by elig_studyid;
+    if b;
+    format redcap_psgpurpose psgpurposef.;
+    if embqs_date_study_recorded < rand_date or rand_date = . then redcap_psgpurpose = 0;
+    else redcap_psgpurpose = 1;
+  run;
+
+  data bestair_in_withrand;
+    retain studyid rand_date stdydt import_psgpurpose;
+    merge randset (rename = (elig_studyid = studyid)) bestair_in (in = b);
+    by studyid;
+    if b;
+    format import_psgpurpose psgpurposef.;
+    if stdydt < rand_date or rand_date = . then do
+      import_psgpurpose = 0;
+      screening = 1;
+    end;
+    else import_psgpurpose = 1;
+  run;
+
+  proc sql noprint;
+
+    select distinct studyid into :toomanypsgs separated by ', '
+    from bestair_in_withrand
+    group by studyid
+    having (count(*) ge 3 and rand_date ne .) OR (count(*) ge 2 and rand_date = .) OR (sum(screening) > 1);
+
+  quit;
+
+  data check4bestpsgs;
+    set bestair_in_withrand;
+    if studyid in (&toomanypsgs);
+  run;
+
+/*  proc sql;*/
+/*    title 'Manually Select Proper PSG';*/
+/*    select distinct studyid from check4bestpsgs;*/
+/*  quit;*/
+
+
+  *73141 first screening embletta had 1.5 hours unreliable oximetry and was retested on 8/08/2012 - pt data. from 7/24/2012 should be excluded;
+  *82205 was reconsented and retested on 5/24/2013 - pt. data from 2/28/2012 should be excluded;
+  *84319 - first "final" psg (10/22/2013) should be excluded for poor oximetry - use final psg from 1/08/2014 instead);
+
+  data bestairpsg_max1pertimepoint;
+    set bestair_in_withrand;
+    by studyid;
+    if studyid in (73143, 82205) then do;
+      if not first.studyid then output bestairpsg_max1pertimepoint;
+    end;
+    else if studyid = 84319 then do;
+      if first.studyid or last.studyid then output bestairpsg_max1pertimepoint;
+    end;
+    else output bestairpsg_max1pertimepoint;
+  run;
+
+  * import spreadsheet with list of variables not collected by Embletta as part of HSS;
+  proc import out=null_for_embletta datafile = "\\rfa01\BWH-SleepEpi-bestair\Data\SAS\bestair psg dd.xls" dbms = xls replace;
+    mixed=yes;
+    getnames = yes;
+    sheet = "NULL_for_embletta";
+    datarow = 2;
+  run;
+
+  proc sql noprint;
+    select NAME into :vars_notin_hss separated by ' '
+    from null_for_embletta;
+  run;
+
+  data bestair_cleanemblettavars;
+    set bestairpsg_max1pertimepoint;
+
+    array fullpsgvars[*] &vars_notin_hss;
+
+    if embletta = 1 then do;
+      do i = 1 to dim(fullpsgvars);
+        fullpsgvars[i] = .;
+      end;
+    end;
+
+    drop i;
+  run;

@@ -25,3 +25,7 @@
 ### Changes
   - Import BestAIR 24hr BP and compare to REDCap.sas
     - Add 3 variables. Reformat to reduce white space.
+  - longitudinal bp.sas
+    - Add variable flagging invalid bp data.
+  - mergebp_labels.sas
+    - Add labels to merged BP data (raw files + QC).

@@ -17,6 +17,43 @@
 ***************************************************************************************;
 * IMPORT BESTAIR MEDICATION DATA FROM REDCAP
 ***************************************************************************************;
+
+*Create Dataset that Stores Observations with Medications and Observations where we Expect Medications (a.k.a. Baseline);
+  data pre_medications;
+    set redcap (where = (med_studyid ne . or redcap_event_name = "00_bv_arm_1"));
+  run;
+
+  proc sort data = pre_medications;
+  by elig_studyid;
+  run;
+
+*Create Datasets of Participants that Need Medication Status Checked;
+  data multi_medtimepoints nomedsentered_anytimepoint missing_medsstudyid;
+    set pre_medications;
+    by elig_studyid;
+    if first.elig_studyid and not last.elig_studyid then output multi_medtimepoints;
+    if first.elig_studyid and last.elig_studyid and med_studyid = . then output nomedsentered_anytimepoint;
+    if med_studyid = . and med_count ne . then output missing_medsstudyid;
+  run;
+
+  proc sql;
+    title "Medications Entered at Multiple Timepoints";
+    title2 "Previous Merge did not Work";
+    select elig_studyid from multi_medtimepoints;
+  quit;
+
+  proc sql;
+    title "No Medications Entered at Any Timepoint";
+    title2 "Check that Participant Truly was Never taking Meds during Study";
+    select elig_studyid from nomedsentered_anytimepoint;
+  quit;
+
+  proc sql;
+    title "Participant Missing Meds_Studyid but has Data";
+    title2 "Participant Will be Mistakenly Excluded from Meds Analysis";
+    select elig_studyid from missing_medsstudyid;
+  quit;
+
 	data medications;
 		set bestair.baredcap;
 		keep elig_studyid med_studyid--medications_complete;

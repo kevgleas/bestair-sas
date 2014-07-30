@@ -257,7 +257,167 @@
     drop filename;
   run;
 
+  ************************************************************************************;
+  * #1 WAKE TIME AFTER SLEEP ONSET
+  ************************************************************************************;
+    waso = timebedm - slpprdp - slplatm;
 
+    *account for rounding and fix negative waso;
+    if -1 <= waso < 0 then waso = 0;
+
+  ************************************************************************************;
+  * #2 TOTAL SLEEP PERIOD VARIABLES
+  ************************************************************************************;
+    time_bed = timebedp;
+
+  ************************************************************************************;
+  * #4 SLEEP EFFICIENCY
+  ************************************************************************************;
+    if timebedp ne 0 then do;
+        slp_eff = 100*(slpprdp)/timebedp;
+    end;
+
+  ************************************************************************************;
+  * #9 RDI
+  * RDI at specified desat  
+      [ (Total number of central apneas at specified desat)
+      + (Total number of obstructive apneas at specified desat)
+      + (hypopneas at specified desat)] 
+      / (hours of sleep)
+  * For all, exclude if total sleep time is zero;
+  * For Profusion2 studies, include AASM hypopneas ('unsure events');
+  ************************************************************************************;
+    if slpprdp gt 0 then do;
+      ahi_a0h0 = 60*(hrembp + hrop + hnrbp + hnrop + 
+            carbp + carop + canbp + canop +
+            oarbp + oarop + oanbp +oanop +
+            urbp + urop + unrbp + unrop) / slpprdp;
+        ahi_a2h2 = 60*(hrembp2 + hrop2 + hnrbp2 + hnrop2 + 
+            carbp2 + carop2 + canbp2 + canop2 +
+            oarbp2 + oarop2 + oanbp2 +oanop2 +
+            urbp2 + urop2 + unrbp2 + unrop2) / slpprdp;
+        ahi_a3h3 = 60*(hrembp3 + hrop3 + hnrbp3 + hnrop3 + 
+            carbp3 + carop3 + canbp3 + canop3 +
+            oarbp3 + oarop3 + oanbp3 + oanop3 +
+            urbp3 + urop3 + unrbp3 + unrop3) / slpprdp;
+        ahi_a4h4 = 60*(hrembp4 + hrop4 + hnrbp4 + hnrop4 + 
+            carbp4 + carop4 + canbp4 + canop4 +
+            oarbp4 + oarop4 + oanbp4 +oanop4 +
+            urbp4 + urop4 + unrbp4 + unrop4) / slpprdp;
+      ahi_a5h5 = 60*(hrembp5 + hrop5 + hnrbp5 + hnrop5 + 
+            carbp5 + carop5 + canbp5 + canop5 +
+            oarbp5 + oarop5 + oanbp5 +oanop5 +
+            urbp5 + urop5 + unrbp5 + unrop5) / slpprdp;
+    end;
+
+  ************************************************************************************;
+  * #13 OAHI - all obstructive apneas and hypopneas with specified desat;
+  * exclude studies where total sleep time is zero;
+  ************************************************************************************;
+    if slpprdp gt 0 then do;
+      oahi_o0h3 = 60*(hrembp3 + hrop3 + hnrbp3 + hnrop3 + oarbp +oarop + oanbp +oanop + urbp3 + urop3 + unrbp3 + unrop3) / slpprdp;
+      oahi_o0h4 = 60*(hrembp4 +hrop4 + hnrbp4 + hnrop4 + oarbp +oarop + oanbp +oanop + urbp4 + urop4 + unrbp4 + unrop4 ) / slpprdp;
+    end;
+
+  ************************************************************************************;
+  * #14 OBSTRUCTIVE APNEA INDEX
+  * exclude studies with total sleep time = 0 or with poor airflow;
+  * for OAI with arousals, exclude studies scored sleep/wake
+  ************************************************************************************;
+    if slpprdp gt 0 then do;
+      oai_o0  = 60*(oarbp +  oarop  + oanbp  + oanop) / slpprdp;
+      oai_o4  = 60*(oarbp4 + oarop4 + oanbp4 + oanop4) / slpprdp;
+    end;
+
+  ************************************************************************************;
+  * #15 Central apnea index;
+  * exclude studies with total sleep time = 0 or
+  * for CAI with arousals, exclude studies scored sleep/wake
+  ************************************************************************************;
+    if slpprdp gt 0 then do;
+      cai_c0 = 60*(carbp +  carop  + canbp  + canop ) / slpprdp;
+      cai_c4 = 60*(carbp4 + carop4 + canbp4 + canop4 ) / slpprdp;
+    end;
+
+  ************************************************************************************;
+  * #16 PERCENT TIME WITH SAO2 < 90,85,80,75
+  ************************************************************************************;
+      pctlt90 = pctsa90h;
+      pctlt85 = pctsa85h;
+      pctlt80 = pctsa80h;
+      pctlt75 = pctsa75h;
+
+  ************************************************************************************;
+  * #18 MINIMUM SA02 IN REM, NREM
+  * exclude studies scored as sleep/wake.
+  ************************************************************************************;
+      if mnsao2rh ne 0 then losao2r = mnsao2rh;
+        else losao2r = .;
+
+      if mnsao2nh ne 0 then losao2nr = mnsao2nh;
+        else losao2nr = .;
+
+  ************************************************************************************;
+  * #19 AVERAGE SA02 DURING SLEEP
+  ************************************************************************************;
+      *create holder variable for average saO2 in rem which = 0 if there is no rem
+        (avoids avgsat being missing due to missing value in calculation);
+      if avsao2rh = . then avsao2rh_holder = 0;
+        else avsao2rh_holder = avsao2rh;
+
+      avgsat = ((avsao2nh) * (tmstg1p+tmstg2p+tmstg34p) + (avsao2rh_holder)*(tmremp))/100;
+      drop avsao2rh_holder;
+
+  ************************************************************************************;
+  * #19 MINIMUM SA02 DURING SLEEP
+  ************************************************************************************;
+      if losao2r = . then minsat = losao2nr;
+      else if losao2nr = . then minsat = losao2r;
+      else minsat = min(losao2r,losao2nr);
+
+  ************************************************************************************;
+  * #20 AVERAGE HYPOPNEA LENGTH
+  ************************************************************************************;
+      hypopnea_denominator = sum(hrembp, hrop, hnrbp, hnrop);
+      hypremback_numerator = max(hrembp, 0);
+      hypremother_numerator = max(hrop, 0);
+      hypnremback_numerator = max(hnrbp, 0);
+      hypnremother_numerator = max(hnrop, 0);
+
+      avghypdur = ((hypremback_numerator/hypopnea_denominator) * max(avhrbp,0)) +
+                      ((hypremother_numerator/hypopnea_denominator) * max(avhrop,0)) +
+                      ((hypnremback_numerator/hypopnea_denominator) * max(avhnbp,0)) +
+                      ((hypnremother_numerator/hypopnea_denominator) * max(avhnop,0));
+
+      drop hypopnea_denominator--hypnremother_numerator;
+
+
+
+    *BestAIR AHI;
+    *all obstructives/centrals, hypopneas with >=3% desat;
+    if slpprdp gt 0 then do;
+      ahi_a0h3 = 60*(hnrbp3 + hnrop3 + canbp + canop + oanbp + oanop + unrbp3 + unrop3) / slpprdp;
+    end;
+
+    drop filename;
+  run;
+
+*****************************************************************************************;
+* quick checking for Mike Morrical;
+*****************************************************************************************;
+  proc sql;
+    title "BestAIR PSG: Sleep latency missing from SAS report?";
+    select pptid, stdatep, stloutp, stonsetp, slplatm, waso
+    from pro2
+    where slplatm < 0; title;
+  quit;
+
+  proc sql;
+    title "BestAIR PSG: WASO missing or negative -- generated from SAS report variables";
+    select pptid, stdatep, stloutp, stonsetp, timebedm, slplatm, slpprdm, slpprdp, waso
+    from pro2
+    where waso < 0; title;
+  quit;
 
 *****************************************************************************************;
 * Format PPTID and clean up dataset

@@ -251,6 +251,40 @@
       med_startdate32 = med_startdate_32;
   run;
 
+  proc contents data = medications2 out = medications2_contents noprint;
+  run;
+
+  proc sql noprint;
+    select NAME into :rename_varlist separated by ' '
+    from medications2_contents
+    where substr(NAME,1,13) = "med_timetaken";
+
+    select substr(NAME,14,2) into :rename_countlist separated by ' '
+    from medications2_contents
+    where substr(NAME,1,13) = "med_timetaken";
+
+    select cat('med_timetaken',substr(NAME,16,1)) into :rename_letterlist separated by ' '
+    from medications2_contents
+    where substr(NAME,1,13) = "med_timetaken";
+  quit;
+
+  %let newlist = %parallel_join(words1=&rename_letterlist, words2=&rename_countlist, joinstr=_, delim1=%str( ), delim2=%str( ));
+
+  data medications2;
+    set medications2;
+
+    rename %parallel_join(words1=&rename_varlist, words2=&newlist, joinstr=%str(=), delim1=%str( ), delim2=%str( ));
+  run;
+
+  data medications2;
+    set medications2;
+    array timetaken_vars[*] med_timetakena_01-med_timetakena_60 med_timetakenb_01-med_timetakenb_60 med_timetakenc_01-med_timetakenc_60;
+    do i = 1 to dim(timetaken_vars);
+      if timetaken_vars[i] < 0 then timetaken_vars[i] = .;
+    end;
+    drop i;
+  run;
+  
   *list each medication as a separate observation by elig_studyid;
   proc transpose data=medications2 out=wide1;
       by elig_Studyid;

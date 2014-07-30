@@ -11,3 +11,10 @@
 
   - import twpas data.sas
     - Move header to README.md.
+
+## July 30, 2014
+
+### Changes
+
+  - import twpas data.sas
+    - Correct and improve METS calculations.

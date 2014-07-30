@@ -19,3 +19,9 @@
 ### Changes
   - Import BestAIR 24hr BP and compare to REDCap.sas
     - Add comments.
+
+## July 29, 2014
+
+### Changes
+  - Import BestAIR 24hr BP and compare to REDCap.sas
+    - Add 3 variables. Reformat to reduce white space.

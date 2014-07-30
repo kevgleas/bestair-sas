@@ -54,6 +54,23 @@
     title2 "Participant Will be Mistakenly Excluded from Meds Analysis";
     select elig_studyid from missing_medsstudyid;
   quit;
+  
+  data medications;
+    set pre_medications;
+    if med_studyid ne .;
+    keep elig_studyid med_studyid--medications_complete;
+  run;
+
+  /*
+  data medications;
+    set bestair.baredcap;
+    keep elig_studyid med_studyid--medications_complete;
+  run;
+
+  proc sql;
+    delete from medications where med_studyid = .;
+  quit;
+  */  
 
 ***************************************************************************************;
 * DETERMINE VISIT DATES (TO BE USED IN CALCULATING WHETHER MEDS WERE TAKEN AT TIMEPOINT)

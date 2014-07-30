@@ -3,6 +3,7 @@
 ****************************************************************************************;
 
 %include "\\rfa01\bwh-sleepepi-bestair\data\sas\bestair options and libnames.sas";
+%include "\\rfa01\bwh-sleepepi-bestair\data\sas\bestair macros for multiple datasets.sas";
 
 ***************************************************************************************;
 * IMPORT ALL BESTAIR REDCAP DATA FOR RANDOMIZED PARTICIPANTS

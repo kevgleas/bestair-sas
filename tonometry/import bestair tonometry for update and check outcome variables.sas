@@ -94,6 +94,121 @@ x net use y: "\\rfa01\BWH-SleepEpi-bestair\Data\Tonometry\Scored" /P:No;
     by studyid timepoint folder;
   run;
 
+  proc format;
+  value ejdurf  0="0: Very Strong"
+          1="1: Strong"
+          2="2: Weak"
+          3="3: Very Weak";
+  run;
+
+  data batonometry;
+  set batonometry;
+
+  label
+  studyid     = "Study ID"
+  Patient_Number  = "Patient's Machine Assigned Number"
+  Date_Of_Birth = "Patient's Date of Birth"
+  SP        = "Entered Brachial Systolic Pressure (mmHg)"
+  DP        = "Entered Brachial Diastolic Pressure (mmHg)"
+  MP        = "Entered Brachial Mean Arterial Pressure (mmHg)"
+  OPERATOR    = "Entered Operator ID (optional)"
+  height = "Patient Height (nearest cm)"
+  weight = "Patient Weight (nearest kg)"
+  body_mass_index = "Body Mass Index"
+  ;
+
+  label
+  sub_type  = "PWA: Pulse Wave Analysis Site"
+  PPAmpRatio    = "PWA: Pulse Pressure Amplification Ratio (%)"
+  P_MAX_DPDT    = "PWA: Peripheral Pulse Maximum dP/dT (max rise in slope of radial upstroke) (mmHg/ms)"
+  QUALITY_ED    = "PWA: Confidence Level of Ejection Duration (0-3 (0=very strong, 3= very weak))"
+  P_QC_PH     = "PWA: Peripheral Pulse Quality Control- Average Pulse Height (signal strenth (arbitrary units))"
+  P_QC_PHV    = "PWA: Peripheral Pulse Quality Control- Pulse Height Variation (degree of variability (unitless))"
+  P_QC_PLV    = "PWA: Peripheral Pulse Quality Control- Pulse Length Variation degree of variability (unitless))"
+  P_QC_DV     = "PWA: Peripheral Pulse Quality Control- Diastolic Variation degree of variability (unitless))"
+  P_QC_SDEV   = "PWA: Peripheral Pulse Quality Control- Shape Deviation degree of variability (unitless))"
+  Operator_Index  = "PWA: Calculated Operator Index (0-100)"
+  P_SP      = "PWA: Peripheral Systolic Pressure (mmHg)"
+  P_DP      = "PWA: Peripheral Diastolic Pressure (mmHg)"
+  P_MEANP     = "PWA: Peripheral Mean Pressure (mmHg)"
+  P_T1      = "PWA: Peripheral T1 (ms)"
+  P_T2      = "PWA: Peripheral T2 (ms)"
+  P_AI      = "PWA: Peripheral Augmentation Index (%)"
+  P_ESP     = "PWA: Peripheral End Systolic Pressure (mmHg)"
+  P_P1      = "PWA: Peripheral P1 mmHg)"
+  P_P2      = "PWA: Peripheral P2 (mmHg)"
+  P_T1ED      = "PWA: Peripheral T1/ED (%)"
+  P_T2ED      = "PWA: Peripheral T2/Ed (%)"
+  P_QUALITY_T1  = "PWA: Peripheral Confidence Level of T1 (0-3 (0=very strong, 3= very weak))"
+  P_QUALITY_T2  = "PWA: Peripheral Confidence Level of T2 (0-3 (0=very strong, 3= very weak))"
+  C_AP      = "PWA: Central Augmentation Pressure (mmHg)"
+  C_AP_HR75   = "PWA: Central Augmentation Pressure @ HR 75 (mmHg)"
+  C_MPS     = "PWA: Central Mean Pressure of Systole (mmHg)"
+  C_MPD     = "PWA: Central Mean Pressure of Diastole (mmHg)"
+  C_TTI     = "PWA: Central Tension Time Index (area under curve during systole) (mmHg*ms)"
+  C_DTI     = "PWA: Central Diastolic Time Index (area under curve during diastole) (mmHg*ms)"
+  C_SVI     = "PWA: Central Subendocardial Viability Ratio (CDTI/CTTI) (%)"
+  C_AL      = "PWA: Central Augmentation Load (when augmentation >0)- extra work by heart because of wave reflection (%)"
+  C_ATI     = "PWA: Central Area of Augmentation (when augmentation >0)- area under the curve of augmentation (mmHg*ms)"
+  HR        = "PWA: Heart Rate (Beats/minute)"
+  C_PERIOD    = "PWA: Heart Rate Period (ms)"
+  C_DD      = "PWA: Central Diastolic Duration (ms)"
+  C_ED_PERIOD   = "PWA: Central ED/Period (%)"
+  C_DD_PERIOD   = "PWA: Diastolic Duration/Period (%)"
+  C_PH      = "PWA: Central Pulse Pressure (mmHg)"
+  C_AGPH      = "PWA: Central Augmentation Index (as percentage of Pulse Pressure) (%)"
+  C_AGPH_HR75   = "PWA: Central Augmentation Index @ HR 75bmp (as percentage of pulse pressure) (%)"
+  C_P1_HEIGHT   = "PWA: Central Pressure at T1-Dp (mmHg)"
+  C_T1R     = "PWA: Time of Start of the Reflected Wave (ms)"
+  C_SP      = "PWA: Central Systolic Pressure (mmHg)"
+  C_DP      = "PWA: Central Diastolic Pressure (mmHg)"
+  C_MEANP     = "PWA: Central Mean Pressure (mmHg)"
+  ;
+
+  label
+  PX_DIST     = "PWV: Proximal Distance"
+  DT_DIST     = "PWV: Distal Distance"
+  PWV_DIST    = "PWV: PWV Distance"
+  ALGORITHM   = "PWV: Pressure Waveform Algorithm Selected"
+  PP_MDT      = "PWV: Pulse to Pulse Mean Delta t (change over time)"
+  PP_DEVIATION  = "PWV: Pulse to Pulse Deviation"
+  PWV       = "PWV: Pulse Wave Velocity (cm/s)"
+  PWVERR      = "PWV: Pulse Wave Velocity Error (Raw)"
+  ptt_sd  = "PWV: Pulse Wave Velocity Standard Deviation (as Percentage)"
+  a_subtype = "PWV: Site A Location (Artery)"
+  A_NOF_10_SETS = "PWV: Site A No of 10sec data sets"
+  A_HR      = "PWV: Site A Heart Rate"
+  A_MDT     = "PWV: Site A Mean Delta t (change over time)"
+  A_DEVIATION_DT  = "PWV: Site A Deviation"
+  A_TON_QC_PH   = "PWV: Site A Pressure Pulse Height"
+  A_TON_QC_PHV  = "PWV: Site A Pressure Pulse Height Variation"
+  A_TON_QC_PLV  = "PWV: Site A Pressure Pulse Length Variation"
+  A_TON_QC_BLV  = "PWV: Site A Pressure Base Line Variation"
+  A_ECG_QC_PH   = "PWV: Site A ECG Pulse Height"
+  A_ECG_QC_PHV  = "PWV: Site A ECG Pulse Height Variation"
+  A_ECG_QC_PLV  = "PWV: Site A ECG Pulse Length Variation"
+  A_ECG_QC_BLV  = "PWV: Site A ECG Base Line Variation"
+  b_subtype = "PWV: Site B Location (Artery)"
+  B_NOF_10_SETS = "PWV: Site B No of 10sec data sets"
+  B_HR      = "PWV: Site B Heart Rate"
+  B_MDT     = "PWV: Site B Mean Delta t (change over time)"
+  B_DEVIATION_DT  = "PWV: Site B Deviation"
+  B_TON_QC_PH   = "PWV: Site B Pressure Pulse Height"
+  B_TON_QC_PHV  = "PWV: Site B Pressure Pulse Height Variation"
+  B_TON_QC_PLV  = "PWV: Site B Pressure Pulse Length Variation"
+  B_TON_QC_BLV  = "PWV: Site B Pressure Base Line Variation"
+  B_ECG_QC_PH   = "PWV: Site B ECG Pulse Height"
+  B_ECG_QC_PHV  = "PWV: Site B ECG Pulse Height Variation"
+  B_ECG_QC_PLV  = "PWV: Site B ECG Pulse Length Variation"
+  B_ECG_QC_BLV  = "PWV: Site B ECG Base Line Variation"
+  ;
+  
+
+  format
+  quality_ed P_QUALITY_T1 P_QUALITY_T2 ejdurf.
+  ;
+run;
+
   *print low quality files;
   proc print data=batonometry noobs;
     var studyid timepoint operator_index;
@@ -197,7 +312,7 @@ x net use y: "\\rfa01\BWH-SleepEpi-bestair\Data\Tonometry\Scored" /P:No;
   data redcap;
     set bestair.baredcap;
   run;
- */ 
+*/  
 
 
   data redcap_tonom;

@@ -54,15 +54,22 @@
     select elig_studyid from missing_medsstudyid;
   quit;
 
-	data medications;
-		set bestair.baredcap;
-		keep elig_studyid med_studyid--medications_complete;
-	run;
+  data medications;
+    set pre_medications;
+    if med_studyid ne .;
+    keep elig_studyid med_studyid--medications_complete;
+  run;
 
-	proc sql;
-		delete from medications where med_studyid = .;
-	quit;
+  /*
+  data medications;
+    set bestair.baredcap;
+    keep elig_studyid med_studyid--medications_complete;
+  run;
 
+  proc sql;
+    delete from medications where med_studyid = .;
+  quit;
+  */
 	data medications2;
 		set medications;
 

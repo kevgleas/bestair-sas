@@ -18,3 +18,10 @@
     - Move header to README.md.
   - import and score whiirs.sas
     - Move header to README.md.
+
+## July 30, 2014
+
+### Changes
+
+  - import and score whiirs.sas
+    - Correct coding for 1 item. NULL scores with missing item.

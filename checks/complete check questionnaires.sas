@@ -103,7 +103,14 @@
   data questionnaires1;
     merge questionnaires1 (in = a) pending_visits (in = b keep = elig_studyid timepoint);
     by elig_studyid timepoint;
-    if not b;
+    *for pending visits, assume all quest data except for calgary;
+    if b then do;
+      array assume_allquestdata[*] _numeric_;
+      do i = 103 to dim(assume_allquestdata);
+        assume_allquestdata[i] = 1;
+      end;
+      drop i;
+    end;
   run;
 
   data questionnaires1;
@@ -133,7 +140,7 @@
 
 *all baselines should be resolved - last baseline 8/02/2013;
 
-  data  questionnaires_baseresolved (drop = cal_d22--cal_f02) 
+  data  questionnaires_baseresolved (drop = cal_d22--cal_f02)
         questionnaires_6resolved (drop = cal_d22--cal_ds05p cal_e27--cal_es05p)
         questionnaires_12resolved (drop = cal_d22--cal_ds05p cal_e27--cal_es05p)
         questionnaires_finalresolved (drop = cal_d22--cal_ds05p cal_e27--cal_es05p);
@@ -141,7 +148,7 @@
     set questionnaires1;
 
     if timepoint = 00 then output questionnaires_baseresolved;
-    else if timepoint = 06 then output questionnaires_6resolved; 
+    else if timepoint = 06 then output questionnaires_6resolved;
     else if timepoint = 12 then output questionnaires_12resolved;
 
     if is_final = 1 then output questionnaires_finalresolved;

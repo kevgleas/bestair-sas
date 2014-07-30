@@ -5,6 +5,16 @@
 %include "\\rfa01\bwh-sleepepi-bestair\data\sas\bestair options and libnames.sas";
 
 ***************************************************************************************;
+* IMPORT ALL BESTAIR REDCAP DATA FOR RANDOMIZED PARTICIPANTS
+***************************************************************************************;
+
+%include "\\rfa01\bwh-sleepepi-bestair\data\sas\redcap\_components\bestair create rand set.sas";
+
+  data redcap;
+    set redcap_rand;
+  run;
+
+***************************************************************************************;
 * IMPORT BESTAIR MEDICATION DATA FROM REDCAP
 ***************************************************************************************;
 	data medications;

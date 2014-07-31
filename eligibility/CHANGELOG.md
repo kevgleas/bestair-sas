@@ -1,3 +1,10 @@
+## July 31, 2014
+
+### Changes
+
+  - import bestair eligibility.sas
+    - Add additional variables.
+
 ## September 5, 2013
 
 ### Changes

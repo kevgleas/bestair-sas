@@ -5,3 +5,5 @@
     - Add macro to create empty dataset.
     - Add macros checking values of key variables.
     - Add macros to rename variables in bulk.
+  - bestair options and libnames.sas
+    -   Add two static libraries.

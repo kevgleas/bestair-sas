@@ -1,3 +1,19 @@
+## July 29, 2014
+
+### Changes
+  - bestair check for missing demographic info.sas
+    - Add 1 additional check.
+  - complete check all.sas
+    - Change titles to be more descriptive in proc sql.
+    - Update to reflect more up-to-date data.
+  - complete check crfs.sas
+    - Update count to reflect additional missing echo.
+    - Update to reflect more up-to-date data.
+  - complete check questionnaires.sas
+    - Update to reflect more up-to-date data.
+  - entry error check.sas
+    - Add additional exception to namecode check.
+
 ## September 9, 2013
 
 ### Changes
@@ -50,15 +66,3 @@
     - Move header to README.md.
   - entry error check.sas
     - Move header to README.md.
-
-## July 29, 2014
-
-### Changes
-  - bestair check for missing demographic info.sas
-    - Add 1 additional check.
-  - complete check all.sas
-    - Update to reflect more up-to-date data.
-  - complete check crfs.sas
-    - Update to reflect more up-to-date data.
-  - complete check questionnaires.sas
-    - Update to reflect more up-to-date data.

@@ -1,10 +1,3 @@
-## August 27, 2013
-
-### Changes
-
-  - import bestair psg data.sas
-    - Move header to README.md.
-
 ## July 30, 2014
 
 ### Changes
@@ -16,3 +9,11 @@
     - Prepare raw psg file import to merge with QC data.
     - Merge QC data. Restrict to 1 PSG per pt per timepoint.
     - Perform QC. Add additional variables to dataset.
+
+
+## August 27, 2013
+
+### Changes
+
+  - import bestair psg data.sas
+    - Move header to README.md.

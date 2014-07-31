@@ -1,3 +1,15 @@
+## July 30, 2014
+
+### Changes
+
+  - bestair tonometry data checking and stats.sas
+    - Improve data QC. Export permanent set with added vars.
+  - import bestair tonometry for update and check outcome variables
+    - Add formats and labels.
+  - import bestair tonometry.sas
+    - Reduce program to shell that calls other programs.
+
+
 ## September 6, 2013
 
 ### Changes
@@ -24,14 +36,3 @@
     - Move header to README.md.
   - isolate pwv and augindex
     - Move header to README.md.
-
-## July 30, 2014
-
-### Changes
-
-  - bestair tonometry data checking and stats.sas
-    - Improve data QC. Export permanent set with added vars.
-  - import bestair tonometry for update and check outcome variables
-    - Add formats and labels.
-  - import bestair tonometry.sas
-    - Reduce program to shell that calls other programs.

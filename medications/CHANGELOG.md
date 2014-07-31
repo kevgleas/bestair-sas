@@ -1,11 +1,4 @@
-## August 27, 2013
-
-### Changes
-
-  - import bestair medications.sas
-    - Move header to README.md.
-
-# July 30, 2014
+## July 30, 2014
 
 ### Changes
 
@@ -20,3 +13,10 @@
     - Add time taken variables to transpose steps.
     - Improve efficiency by reducing to 1 step med class.
     - Move medication category section to new program.
+
+## August 27, 2013
+
+### Changes
+
+  - import bestair medications.sas
+    - Move header to README.md.

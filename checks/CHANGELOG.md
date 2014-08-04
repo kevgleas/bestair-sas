@@ -1,3 +1,9 @@
+## August 4, 2014
+
+### Changes
+  - complete check questionnaires.sas
+    - Comment out coding for pending data (all collected).
+
 ## July 29, 2014
 
 ### Changes

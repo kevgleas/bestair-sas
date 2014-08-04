@@ -98,7 +98,7 @@
     by elig_studyid timepoint;
     if a;
   run;
-
+/*
   *exclude pending visits from calculation (6-month visit timepoint is created in REDCap at time of 6-month phone call);
   data questionnaires1;
     merge questionnaires1 (in = a) pending_visits (in = b keep = elig_studyid timepoint);
@@ -112,6 +112,7 @@
       drop i;
     end;
   run;
+*/
 
   data questionnaires1;
     set questionnaires1;
@@ -432,6 +433,6 @@
 ****************************************************************************************;
 * EXPORT COMPLETENESS TABLES AS CSVs
 ****************************************************************************************;
-  proc export data=questionnaires_allcomp dbms=csv outfile="c:\users\kg693\desktop\complete questionnaire averages.csv"; run;
+  proc export data=quest_compstatsfinal dbms=csv outfile="c:\users\kg693\desktop\complete questionnaire averages.csv"; run;
   proc export data=questionnaires_resolvedcomp dbms=csv outfile="c:\users\kg693\desktop\nonpending questionnaire averages.csv"; run; */
 

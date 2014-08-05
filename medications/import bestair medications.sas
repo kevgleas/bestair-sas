@@ -203,6 +203,8 @@
 
     med_startdate02 = med_startdate_02;
     med_startdate32 = med_startdate_32;
+
+    drop i j k;
   run;
 
   proc contents data = medications2 out = medications2_contents noprint;

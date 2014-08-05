@@ -554,88 +554,17 @@
   run;
 
   *create datasets for matched and unmatched mednames;
-  data bamed_matched bamed_unmatched;
+  data bamed_matched (drop = matched i) bamed_unmatched (drop = matched i);
     set premerge;
 
-      if lowcase(medname) = lowcase(mednames) or
-        lowcase(medname) = lowcase(brandname1) or
-        lowcase(medname) = lowcase(brandname2) or
-        lowcase(medname) = lowcase(brandname3) or
-        lowcase(medname) = lowcase(altnames) or
-        lowcase(medname) = lowcase(altname1) or
-        lowcase(medname) = lowcase(altname2) or
-        lowcase(medname) = lowcase(altname3) or
-        lowcase(medname) = lowcase(altname4) or
-        lowcase(medname) = lowcase(altname5) or
-        lowcase(medname) = lowcase(altname6) or
-        lowcase(medname) = lowcase(altname7) or
-        lowcase(medname) = lowcase(altname8) or
-        lowcase(medname) = lowcase(altname9) or
-        lowcase(medname) = lowcase(altname10) or
-        lowcase(medname) = lowcase(altname11) or
-        lowcase(medname) = lowcase(altname12) or
-        lowcase(medname) = lowcase(altname13) or
-        lowcase(medname) = lowcase(altname14) or
-        lowcase(medname) = lowcase(altname15) or
-        lowcase(medname) = lowcase(altname16) or
-        lowcase(medname) = lowcase(altname17) or
-        lowcase(medname) = lowcase(altname18) or
-        lowcase(medname) = lowcase(altname19) or
-        lowcase(medname) = lowcase(altname20) or
-        lowcase(medname) = lowcase(altname21) or
-        lowcase(medname) = lowcase(altname22) or
-        lowcase(medname) = lowcase(altname23) or
-        lowcase(medname) = lowcase(altname24) or
-        lowcase(medname) = lowcase(altname25) or
-        lowcase(medname) = lowcase(altname26) or
-        lowcase(medname) = lowcase(altname27) or
-        lowcase(medname) = lowcase(altname28) or
-        lowcase(medname) = lowcase(altname29) or
-        lowcase(medname) = lowcase(altname30) or
-        lowcase(medname) = lowcase(altname31) or
-        lowcase(medname) = lowcase(altname32) or
-        lowcase(medname) = lowcase(altname33) or
-        lowcase(medname) = lowcase(altname34) or
-        lowcase(medname) = lowcase(altname35) or
-        lowcase(medname) = lowcase(altname36) or
-        lowcase(medname) = lowcase(altname37) or
-        lowcase(medname) = lowcase(altname38) or
-        lowcase(medname) = lowcase(altname39) or
-        lowcase(medname) = lowcase(altname40) or
-        lowcase(medname) = lowcase(altname41) or
-        lowcase(medname) = lowcase(altname42) or
-        lowcase(medname) = lowcase(altname43) or
-        lowcase(medname) = lowcase(altname44) or
-        lowcase(medname) = lowcase(altname45) or
-        lowcase(medname) = lowcase(altname46) or
-        lowcase(medname) = lowcase(altname47) or
-        lowcase(medname) = lowcase(altname48) or
-        lowcase(medname) = lowcase(altname49) or
-        lowcase(medname) = lowcase(altname50) or
-        lowcase(medname) = lowcase(altname51) or
-        lowcase(medname) = lowcase(altname52) or
-        lowcase(medname) = lowcase(altname53) or
-        lowcase(medname) = lowcase(altname54) or
-        lowcase(medname) = lowcase(altname55) or
-        lowcase(medname) = lowcase(altname56) or
-        lowcase(medname) = lowcase(altname57) or
-        lowcase(medname) = lowcase(altname58) or
-        lowcase(medname) = lowcase(altname59) or
-        lowcase(medname) = lowcase(altname60) or
-        lowcase(medname) = lowcase(altname61) or
-        lowcase(medname) = lowcase(altname62) or
-        lowcase(medname) = lowcase(altname63) or
-        lowcase(medname) = lowcase(altname64) or
-        lowcase(medname) = lowcase(altname65) or
-        lowcase(medname) = lowcase(altname66) or
-        lowcase(medname) = lowcase(altname67) or
-        lowcase(medname) = lowcase(altname68) or
-        lowcase(medname) = lowcase(altname69) or
-        lowcase(medname) = lowcase(altname70) or
-        lowcase(medname) = lowcase(altname71) or
-        lowcase(medname) = lowcase(altname72) or
-        lowcase(medname) = lowcase(altname73)
-        then output bamed_matched;
+      array atc_mednames[*] $ mednames--altname73;
+
+      do i = 1 to dim(atc_mednames);
+        if lowcase(medname) = lowcase(atc_mednames[i]) then matched = 1;
+        if matched = 1 then leave;
+      end;
+
+    if matched = 1 then output bamed_matched;
     else output bamed_unmatched;
   run;
 

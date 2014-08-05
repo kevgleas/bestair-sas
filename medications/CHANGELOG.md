@@ -1,3 +1,18 @@
+## August 5, 2014
+
+### Changes
+
+  - import bestair medications.sas
+    - Refactor step that rectifies variable names to med standard.
+    - Refactor step merging REDCap medications with ATC codes.
+    - Delete med category count section (moved to "med frequency testing.sas).
+  - med frequency testing.sas
+    - Refactor medication classification section.
+    - Refactor medication count by class using macro.
+    - Remove rarely used (and internal testing) steps for bp and diabetes meds.
+
+
+
 ## July 30, 2014
 
 ### Changes

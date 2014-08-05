@@ -766,6 +766,16 @@ run;
 *  MEDICATION COUNTS BY CLASS;
 ****************************************;
 
+%macro medclass_counter(outputset, classification, baselinevarname, mo6varname, mo12varname);
+  proc sql;
+    create table &outputset as
+    select elig_studyid, sum(timepoint1) as &baselinevarname, sum(timepoint2) as &mo6varname, sum(timepoint3) as &mo12varname
+    from huge_medclass
+    where &classification = 1
+    group by elig_studyid;
+  quit;
+%mend;
+
   proc sql;
     create table med_allmeds_recount as
     select elig_studyid, sum(timepoint1) as allmeds_n00, sum(timepoint2) as allmeds_n06, sum(timepoint3) as allmeds_n12
@@ -773,126 +783,21 @@ run;
     group by elig_studyid;
   quit;
 
-  proc sql;
-    create table med_aceinhibitor_recount as
-    select elig_studyid, sum(timepoint1) as aceinhibitor_n00, sum(timepoint2) as aceinhibitor_n06, sum(timepoint3) as aceinhibitor_n12
-    from huge_medclass
-    where aceinhibitor = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_alphablocker_recount as
-    select elig_studyid, sum(timepoint1) as alphablocker_n00, sum(timepoint2) as alphablocker_n06, sum(timepoint3) as alphablocker_n12
-    from huge_medclass
-    where alphablocker = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_aldosteroneblocker_recount as
-    select elig_studyid, sum(timepoint1) as aldosteroneblocker_n00, sum(timepoint2) as aldosteroneblocker_n06, sum(timepoint3) as aldosteroneblocker_n12
-    from huge_medclass
-    where aldosteroneblocker = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_angiotensinblocker_recount as
-    select elig_studyid, sum(timepoint1) as angiotensinblocker_n00, sum(timepoint2) as angiotensinblocker_n06, sum(timepoint3) as angiotensinblocker_n12
-    from huge_medclass
-    where angiotensinblocker = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_antidepressant_recount as
-    select elig_studyid, sum(timepoint1) as antidepressant_n00, sum(timepoint2) as antidepressant_n06, sum(timepoint3) as antidepressant_n12
-    from huge_medclass
-    where antidepressant = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_betablocker_recount as
-    select elig_studyid, sum(timepoint1) as betablocker_n00, sum(timepoint2) as betablocker_n06, sum(timepoint3) as betablocker_n12
-    from huge_medclass
-    where betablocker = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_calciumblocker_recount as
-    select elig_studyid, sum(timepoint1) as calciumblocker_n00, sum(timepoint2) as calciumblocker_n06, sum(timepoint3) as calciumblocker_n12
-    from huge_medclass
-    where calciumblocker = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_diabetesmed_recount as
-    select elig_studyid, sum(timepoint1) as diabetesmed_n00, sum(timepoint2) as diabetesmed_n06, sum(timepoint3) as diabetesmed_n12
-    from huge_medclass
-    where diabetesmed = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_diuretic_recount as
-    select elig_studyid, sum(timepoint1) as diuretic_n00, sum(timepoint2) as diuretic_n06, sum(timepoint3) as diuretic_n12
-    from huge_medclass
-    where diuretic = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_lipidlowering_recount as
-    select elig_studyid, sum(timepoint1) as lipidlowering_n00, sum(timepoint2) as lipidlowering_n06, sum(timepoint3) as lipidlowering_n12
-    from huge_medclass
-    where lipidlowering = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_antihypertensive_recount as
-    select elig_studyid, sum(timepoint1) as antihypertensive_n00, sum(timepoint2) as antihypertensive_n06, sum(timepoint3) as antihypertensive_n12
-    from huge_medclass
-    where antihypertensive = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_statin_recount as
-    select elig_studyid, sum(timepoint1) as statin_n00, sum(timepoint2) as statin_n06, sum(timepoint3) as statin_n12
-    from huge_medclass
-    where statin = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_nitrate_recount as
-    select elig_studyid, sum(timepoint1) as nitrate_n00, sum(timepoint2) as nitrate_n06, sum(timepoint3) as nitrate_n12
-    from huge_medclass
-    where nitrate = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_perdilator_recount as
-    select elig_studyid, sum(timepoint1) as peripheraldilator_n00, sum(timepoint2) as peripheraldilator_n06, sum(timepoint3) as peripheraldilator_n12
-    from huge_medclass
-    where peripheral_dilator = 1
-    group by elig_studyid;
-  quit;
-
-  proc sql;
-    create table med_otherah_recount as
-    select elig_studyid, count(totalamount_taken1) as otherah_n00, count(totalamount_taken2) as otherah_n06, count(totalamount_taken3) as otherah_n12
-    from huge_medclass
-    where otherah = 1
-    group by elig_studyid;
-  quit;
-
+  %medclass_counter(med_aceinhibitor_recount, aceinhibitor, aceinhibitor_n00, aceinhibitor_n06, aceinhibitor_n12);
+  %medclass_counter(med_alphablocker_recount2, alphablocker, alphablocker_n00, alphablocker_n06, alphablocker_n12);
+  %medclass_counter(med_aldosteroneblocker_recount2, aldosteroneblocker, aldosteroneblocker_n00, aldosteroneblocker_n06, aldosteroneblocker_n12);
+  %medclass_counter(med_angiotensinblocker_recount2, angiotensinblocker, angiotensinblocker_n00, angiotensinblocker_n06, angiotensinblocker_n12);
+  %medclass_counter(med_antidepressant_recount2, antidepressant, antidepressant_n00, antidepressant_n06, antidepressant_n12);
+  %medclass_counter(med_betablocker_recount2, betablocker, betablocker_n00, betablocker_n06, betablocker_n12);
+  %medclass_counter(med_calciumblocker_recount2, calciumblocker, calciumblocker_n00, calciumblocker_n06, calciumblocker_n12);
+  %medclass_counter(med_diabetesmed_recount2, diabetesmed, diabetesmed_n00, diabetesmed_n06, diabetesmed_n12);
+  %medclass_counter(med_diuretic_recount2, diuretic, diuretic_n00, diuretic_n06, diuretic_n12);
+  %medclass_counter(med_lipidlowering_recount2, lipidlowering, lipidlowering_n00, lipidlowering_n06, lipidlowering_n12);
+  %medclass_counter(med_antihypertensive_recount2, antihypertensive, antihypertensive_n00, antihypertensive_n06, antihypertensive_n12);
+  %medclass_counter(med_statin_recount2, statin, statin_n00, statin_n06, statin_n12);
+  %medclass_counter(med_nitrate_recount2, nitrate, nitrate_n00, nitrate_n06, nitrate_n12);
+  %medclass_counter(med_perdilator_recount2, peripheral_dilator, peripheraldilator_n00, peripheraldilator_n06, peripheraldilator_n12);
+  %medclass_counter(med_otherah_recount2, otherah, otherah_n00, otherah_n06, otherah_n12);
 
   data newmedcount;
     merge Final_expected_visit med_allmeds_recount med_aceinhibitor_recount med_alphablocker_recount med_aldosteroneblocker_recount med_angiotensinblocker_recount med_antidepressant_recount

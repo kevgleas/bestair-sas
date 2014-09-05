@@ -664,6 +664,7 @@
     aceinhibitor = 0;
     alphablocker = 0;
     aldosteroneblocker = 0;
+    angiotensinblocker = 0;
     antidepressant = 0;
     betablocker = 0;
     calciumblocker = 0;
@@ -680,6 +681,7 @@
       if  substr(atccode_vars[i],1,4) in ('C09A','C09B') or substr(atccode_vars[i],1,7) = 'C10BX04' then aceinhibitor = 1;
       if substr(atccode_vars[i],1,5) = 'C02CA' then alphablocker = 1;
       if substr(atccode_vars[i],1,5) = 'C03DA' then aldosteroneblocker = 1;
+      if substr(atccode_vars[i],1,4) = 'C09C' then angiotensinblocker = 1;
       if substr(atccode_vars[i],1,4) = 'N06A' then antidepressant = 1;
       if  substr(atccode_vars[i],1,3) = 'C07' then betablocker = 1;
       if substr(atccode_vars[i],1,3) = 'C08' or substr(atccode_vars[i],1,5) = 'C09BB' or substr(atccode_vars[i],1,5) = 'C09DB' or substr(atccode_vars[i],1,7) in ('C09DX03','C10BX03') 
@@ -745,7 +747,7 @@
       med_dose_incr12 = 0;
     end;
 
-    drop mednames atccode1--atccode25;
+    drop mednames atccode1--atccode25 i;
 run;
 
     data huge_medclass;
@@ -757,8 +759,9 @@ run;
     run;
 
   proc freq data= huge_medclass;
-    tables aceinhibitor alphablocker aldosteroneblocker antidepressant betablocker calciumblocker diuretic diabetesmed lipidlowering antihypertensive statin nitrate peripheral_dilator otherah
-          med_dose_change06 med_dose_change12;
+    tables aceinhibitor alphablocker aldosteroneblocker angiotensinblocker antidepressant betablocker calciumblocker diuretic diabetesmed lipidlowering antihypertensive 
+            statin nitrate peripheral_dilator otherah
+            med_dose_change06 med_dose_change12;
   run;
 
 
@@ -784,20 +787,20 @@ run;
   quit;
 
   %medclass_counter(med_aceinhibitor_recount, aceinhibitor, aceinhibitor_n00, aceinhibitor_n06, aceinhibitor_n12);
-  %medclass_counter(med_alphablocker_recount2, alphablocker, alphablocker_n00, alphablocker_n06, alphablocker_n12);
-  %medclass_counter(med_aldosteroneblocker_recount2, aldosteroneblocker, aldosteroneblocker_n00, aldosteroneblocker_n06, aldosteroneblocker_n12);
-  %medclass_counter(med_angiotensinblocker_recount2, angiotensinblocker, angiotensinblocker_n00, angiotensinblocker_n06, angiotensinblocker_n12);
-  %medclass_counter(med_antidepressant_recount2, antidepressant, antidepressant_n00, antidepressant_n06, antidepressant_n12);
-  %medclass_counter(med_betablocker_recount2, betablocker, betablocker_n00, betablocker_n06, betablocker_n12);
-  %medclass_counter(med_calciumblocker_recount2, calciumblocker, calciumblocker_n00, calciumblocker_n06, calciumblocker_n12);
-  %medclass_counter(med_diabetesmed_recount2, diabetesmed, diabetesmed_n00, diabetesmed_n06, diabetesmed_n12);
-  %medclass_counter(med_diuretic_recount2, diuretic, diuretic_n00, diuretic_n06, diuretic_n12);
-  %medclass_counter(med_lipidlowering_recount2, lipidlowering, lipidlowering_n00, lipidlowering_n06, lipidlowering_n12);
-  %medclass_counter(med_antihypertensive_recount2, antihypertensive, antihypertensive_n00, antihypertensive_n06, antihypertensive_n12);
-  %medclass_counter(med_statin_recount2, statin, statin_n00, statin_n06, statin_n12);
-  %medclass_counter(med_nitrate_recount2, nitrate, nitrate_n00, nitrate_n06, nitrate_n12);
-  %medclass_counter(med_perdilator_recount2, peripheral_dilator, peripheraldilator_n00, peripheraldilator_n06, peripheraldilator_n12);
-  %medclass_counter(med_otherah_recount2, otherah, otherah_n00, otherah_n06, otherah_n12);
+  %medclass_counter(med_alphablocker_recount, alphablocker, alphablocker_n00, alphablocker_n06, alphablocker_n12);
+  %medclass_counter(med_aldosteroneblocker_recount, aldosteroneblocker, aldosteroneblocker_n00, aldosteroneblocker_n06, aldosteroneblocker_n12);
+  %medclass_counter(med_angiotensinblocker_recount, angiotensinblocker, angiotensinblocker_n00, angiotensinblocker_n06, angiotensinblocker_n12);
+  %medclass_counter(med_antidepressant_recount, antidepressant, antidepressant_n00, antidepressant_n06, antidepressant_n12);
+  %medclass_counter(med_betablocker_recount, betablocker, betablocker_n00, betablocker_n06, betablocker_n12);
+  %medclass_counter(med_calciumblocker_recount, calciumblocker, calciumblocker_n00, calciumblocker_n06, calciumblocker_n12);
+  %medclass_counter(med_diabetesmed_recount, diabetesmed, diabetesmed_n00, diabetesmed_n06, diabetesmed_n12);
+  %medclass_counter(med_diuretic_recount, diuretic, diuretic_n00, diuretic_n06, diuretic_n12);
+  %medclass_counter(med_lipidlowering_recount, lipidlowering, lipidlowering_n00, lipidlowering_n06, lipidlowering_n12);
+  %medclass_counter(med_antihypertensive_recount, antihypertensive, antihypertensive_n00, antihypertensive_n06, antihypertensive_n12);
+  %medclass_counter(med_statin_recount, statin, statin_n00, statin_n06, statin_n12);
+  %medclass_counter(med_nitrate_recount, nitrate, nitrate_n00, nitrate_n06, nitrate_n12);
+  %medclass_counter(med_perdilator_recount, peripheral_dilator, peripheraldilator_n00, peripheraldilator_n06, peripheraldilator_n12);
+  %medclass_counter(med_otherah_recount, otherah, otherah_n00, otherah_n06, otherah_n12);
 
   data newmedcount;
     merge Final_expected_visit med_allmeds_recount med_aceinhibitor_recount med_alphablocker_recount med_aldosteroneblocker_recount med_angiotensinblocker_recount med_antidepressant_recount

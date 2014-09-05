@@ -1,3 +1,12 @@
+## September 5, 2014
+
+### Changes
+
+  - med frequency testing.sas
+    - Fix Angiotensinblocker counter.
+    - Fix merge of med classes.
+
+
 ## August 5, 2014
 
 ### Changes

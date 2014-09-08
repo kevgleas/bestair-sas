@@ -308,11 +308,6 @@
   by medname;
   run;
 
-  data aaacheckme;
-    set typical_strength;
-    if find(med_strength,'.') > 0;
-  run;
-
   data dailyamount unable2identify_units;
     set typical_strength (where = (med_prn ne 1));
 
@@ -684,7 +679,7 @@
       if substr(atccode_vars[i],1,4) = 'C09C' then angiotensinblocker = 1;
       if substr(atccode_vars[i],1,4) = 'N06A' then antidepressant = 1;
       if  substr(atccode_vars[i],1,3) = 'C07' then betablocker = 1;
-      if substr(atccode_vars[i],1,3) = 'C08' or substr(atccode_vars[i],1,5) = 'C09BB' or substr(atccode_vars[i],1,5) = 'C09DB' or substr(atccode_vars[i],1,7) in ('C09DX03','C10BX03') 
+      if substr(atccode_vars[i],1,3) = 'C08' or substr(atccode_vars[i],1,5) = 'C09BB' or substr(atccode_vars[i],1,5) = 'C09DB' or substr(atccode_vars[i],1,7) in ('C09DX03','C10BX03')
           then calciumblocker = 1;
       if substr(atccode_vars[i],1,3) = 'C03' or substr(atccode_vars[i],1,4) in ('C02L','C07B','C07C','C07D','C08G') or substr(atccode_vars[i],1,5) in ('C09BA','C09DA') or
           substr(atccode_vars[i],1,7) in ('C09DX01','C09DX03') then diuretic = 1;
@@ -759,7 +754,7 @@ run;
     run;
 
   proc freq data= huge_medclass;
-    tables aceinhibitor alphablocker aldosteroneblocker angiotensinblocker antidepressant betablocker calciumblocker diuretic diabetesmed lipidlowering antihypertensive 
+    tables aceinhibitor alphablocker aldosteroneblocker angiotensinblocker antidepressant betablocker calciumblocker diuretic diabetesmed lipidlowering antihypertensive
             statin nitrate peripheral_dilator otherah
             med_dose_change06 med_dose_change12;
   run;

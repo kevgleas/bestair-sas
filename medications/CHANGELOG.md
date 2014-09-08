@@ -1,3 +1,11 @@
+## September 8, 2014
+
+### Changes
+
+  - med frequency testing.sas
+    - Delete step that created dataset used one time for manual check.
+
+
 ## September 5, 2014
 
 ### Changes

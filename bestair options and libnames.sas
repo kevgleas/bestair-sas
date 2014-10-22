@@ -24,6 +24,7 @@ libname bestair "&bestairpath.\SAS\_datasets";
 libname bestair2 "&bestairpath.\SAS\_archive";
 libname bestdsmb "&bestairpath.\SAS\_datasets_dsmb_2014apr";
 libname bestats "&bestairpath.\SAS\_datasets_ats_2014may";
+libname bestprim "&bestairpath.\SAS\_datasets_primary_2014aug";
 
 
 *Create format dataset;
@@ -173,5 +174,3 @@ run;
       drop table temp_;
     quit;
   %mend;
-
-

@@ -81,12 +81,21 @@
     semsa_oe_nmiss = nmiss(of semsa_decaccdriving--semsa_desire);
     semsa_tse_nmiss = nmiss(of semsa_claustro--semsa_paysomecost);
 
-    if semsa_pr_nmiss > 0
+		*semsa subscale = mean of nonmissing responses;
+		semsa_pr = semsa_pr/(8-semsa_pr_nmiss);
+		semsa_oe = semsa_oe/(10-semsa_oe_nmiss);
+		semsa_tse = semsa_tse/(9-semsa_tse_nmiss);
+		
+    if semsa_pr_nmiss = 8
       then semsa_pr = .;
-    if semsa_oe_nmiss > 0
+    if semsa_oe_nmiss = 10
       then semsa_oe = .;
-    if semsa_tse_nmiss > 0
+    if semsa_tse_nmiss = 9
       then semsa_tse = .;
+
+		label semsa_pr = "SEMSA: Perceived Risk Subscale";
+		label semsa_oe = "SEMSA: Outcome Expectancies Subscale";
+		label semsa_tse = "SEMSA: Treatment Self-Efficacy Subscale";
 
   run;
 
